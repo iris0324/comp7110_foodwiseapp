@@ -1,7 +1,7 @@
 import {CONFIG} from '../config.js?v=13.0';
 import {sampleRows} from '../data/seed.js?v=13.0';
 export async function decodeReceipt(file){
- if(!file||!file.type.startsWith('image/'))throw Error('imageTypeError');
+ if(!file||!(file.type?.startsWith('image/')||/\.(heic|heif|jpe?g|png|webp)$/i.test(file.name||'')))throw Error('imageTypeError');
  if(file.size>18*1024*1024)throw Error('imageSizeError');
  const url=URL.createObjectURL(file);
  try{const image=new Image();image.src=url;await image.decode();if(!image.naturalWidth)throw Error();return url;}

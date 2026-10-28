@@ -5,12 +5,12 @@ import {entryPage,initialPage,ONBOARDING_KEY} from './app/onboarding.js?v=13.0';
 import {clone,uid,money,cents,half,qty,sub,cmp,daysUntil,today,reductionQty} from './core/values.js?v=13.0';
 import {cartFields,foodFields} from './domain/commands.js?v=13.0';
 import {getStory,getOutcome} from './domain/selectors.js?v=13.0';
-import {receiptServices} from './domain/receipt.js?v=13.0';
+import {receiptServices} from './domain/receipt.js?v=13.1';
 import {t,setLanguage,getLanguage} from './i18n/index.js?v=13.0';
 import {esc,$} from './ui/dom.js?v=13.0';
 import {icon,title,btn,nav,notice,sprite,resultKey,reductionSummary} from './ui/components.js?v=13.0';
-import {foodScreen} from './ui/screens/food.js?v=13.0';
-import {ghostScreen,sameNameCard,reductionPreview,cartPricePreview} from './ui/screens/ghost-v8.js?v=13.0';
+import {foodScreen} from './ui/screens/food.js?v=13.1';
+import {ghostScreen,sameNameCard,reductionPreview,cartPricePreview} from './ui/screens/ghost-v8.js?v=13.1';
 import {storyScreen,actionPreview,useAmountPreview,buyLessPreview} from './ui/screens/story.js?v=13.0';
 import {authScreen} from './ui/screens/auth.js?v=13.0';
 import {bindFeed} from './interaction/feed.js?v=13.0';
@@ -20,7 +20,7 @@ import {decodeQRPhoto} from './scanners/qr-scanner.js?v=13.0';
 const store=new Store(new Repository());
 const catalog=new CatalogService();
 const animator=new Animator();
-let motionSheetAvailable=true;let cartSaveTimer=null;let cameraStream=null;let cameraUnavailable=false;let activityPlayedKey='';
+let motionSheetAvailable=true;let cartSaveTimer=null;let cameraStream=null;let cameraUnavailable=false;let cameraRequest=0;let activityPlayedKey='';
 let guestEnteredThisLaunch=false;
 let current=route(),editor=null,editorBaseline='',modal=null,modalFocus=null,cleanupFeed=()=>{},playing=null,phase='result',message='',generating=false,external=false,previewToken=0;
 const filters={search:'',category:'',status:'available'};
@@ -31,19 +31,37 @@ function editorData(e){if(!e)return null;if(e.type==='receipt')return {id:e.id,r
 function scheduleCartSave(){if(!editor||editor.type!=='cart'||current.page!=='cart'||store.pending)return;clearTimeout(cartSaveTimer);cartSaveTimer=setTimeout(()=>{cartSaveTimer=null;if(editor?.type==='cart'&&dirty()&&!store.pending)saveDraft();},700);}
 function markBaseline(){editorBaseline=JSON.stringify(editorData(editor));}
 function dirty(){return !!editor&&['cart','receipt','custom'].includes(editor.type)&&JSON.stringify(editorData(editor))!==editorBaseline;}
-function releaseEditor(){previewToken++;if(editor?.imageUrl)URL.revokeObjectURL(editor.imageUrl);if(editor?.productPhotoUrl)URL.revokeObjectURL(editor.productPhotoUrl);editor=null;}
+function releaseEditor(){
+ previewToken++;
+ if(editor?.imageUrl)URL.revokeObjectURL(editor.imageUrl);
+ if(editor?.productPhotoUrl)URL.revokeObjectURL(editor.productPhotoUrl);
+ if(editor?.photoUrls)Object.values(editor.photoUrls).forEach(url=>URL.revokeObjectURL(url));
+ editor=null;
+}
+function restoreCartPhotos(ref){
+ for(const item of ref.rows||[]){
+  if(!item.photoId)continue;
+  store.repository.getMedia(item.photoId).then(blob=>{
+   if(!blob||editor!==ref)return;
+   const url=URL.createObjectURL(blob);
+   if(editor!==ref){URL.revokeObjectURL(url);return;}
+   ref.photoUrls[item.cartItemId]=url;
+   if(current.page==='cart')render();
+  }).catch(()=>{});
+ }
+}
 function prepareEditor(r){
  const s=store.state;
  if(r.page==='story'){const st=getStory(s,r.id);if(st?.currentStep==='custom_edit'||(st?.currentStep==='source'&&s.drafts.some(d=>d.type==='custom'&&d.targetId===r.id))){r.page='custom';history.replaceState(null,'',path('custom',r.id));}}
  if(['cart','ghost-add','product-camera','product-review'].includes(r.page)){
-  if(editor?.type!=='cart'){releaseEditor();editor={type:'cart',rows:clone(s.cart)};markBaseline();}
+  if(editor?.type!=='cart'){releaseEditor();editor={type:'cart',rows:clone(s.cart),photoUrls:{}};markBaseline();restoreCartPhotos(editor);}
   if(['ghost-add','product-camera','product-review'].includes(r.page)&&!editor.rows.some(x=>x.cartItemId===r.id)){let row=blankCart();try{const saved=JSON.parse(localStorage.getItem('fw-pending-item')||'null');if(saved?.cartItemId===r.id)row=saved;}catch{}row.cartItemId=r.id||row.cartItemId;editor.rows.push(row);current.id=row.cartItemId;history.replaceState(null,'',path(r.page,row.cartItemId));}
   if(['ghost-add','product-review'].includes(r.page)){const row=editor.rows.find(x=>x.cartItemId===current.id);if(row?.productId)editor.scannedProduct=catalog.getProduct(row.productId);}
   return;
  }
  if(['receipt','receipt-camera'].includes(r.page)){
   const saved=s.receiptImports.find(x=>x.id===r.id&&x.status==='draft')||(!r.id?s.receiptImports.find(x=>x.status==='draft'):null);
-  releaseEditor();editor={type:'receipt',id:saved?.id||uid(),rows:clone(saved?.rawRows||[]),imageId:saved?.imageId||null,sample:saved?!!saved.sample:false,qrPayload:saved?.qrPayload||null,receiptId:saved?.receiptId||null,storeName:saved?.storeName||null,receiptTotal:saved?.receiptTotal||null,imageUrl:null,blob:null};markBaseline();
+  releaseEditor();editor={type:'receipt',id:saved?.id||uid(),rows:clone(saved?.rawRows||[]),imageId:saved?.imageId||null,sample:saved?!!saved.sample:false,qrPayload:saved?.qrPayload||null,receiptId:saved?.receiptId||null,storeName:saved?.storeName||null,receiptTotal:saved?.receiptTotal||null,imageUrl:null,blob:null,photoStatus:saved?.imageId?'ready':'',photoIssue:''};markBaseline();
   if(saved?.imageId){const ref=editor;store.repository.getMedia(saved.imageId).then(blob=>{if(editor===ref&&blob){editor.imageUrl=URL.createObjectURL(blob);render();}}).catch(()=>{if(editor===ref){message='previewError';render();}});}
   return;
  }
@@ -83,7 +101,7 @@ function settings(){
  return `<div class="eyebrow">GHOST BUY</div><h1>${getLanguage()==='zh'?'Ghost Buy 設定':'Ghost Buy Settings'}</h1><section class="setting-card">${option(getLanguage()==='zh'?'故事動畫':'Story Animations',getLanguage()==='zh'?'啟用故事中的非必要動畫':'Enable optional story movement','storyAnimations')}${option(getLanguage()==='zh'?'減少動態':'Reduce Motion',getLanguage()==='zh'?'減少動態與過場效果':'Limit movement and transitions','reduceMotion')}${option(getLanguage()==='zh'?'故事操作提示':'Story Guidance',getLanguage()==='zh'?'顯示可選的故事操作提示':'Show optional story guidance','storyGuidance')}</section><section class="setting-card"><button class="button outline" data-action="exit-guest">${getLanguage()==='zh'?'退出訪客／返回登入':'Exit Guest / Back to Log In'}</button></section>`;
 }
 function modalBody(){const m=modal;if(!m)return '';let content;
- if(m.type==='add-food')content=`<h2>${t('addFood')}</h2>${nav('takePhoto','receipt-camera','','coral')}${nav('manual','food-new','','outline')}${btn('close','modal-close','','text')}`;
+ if(m.type==='add-food')content=`<h2>${t('addFood')}</h2><div class="add-food-choices">${nav('takePhoto','receipt-camera','','coral')}${nav('manual','food-new','','outline')}</div><button type="button" class="add-food-close" data-action="modal-close">${t('close')}</button>`;
  if(m.type==='food-delete')content=`<h2>${getLanguage()==='zh'?'刪除此食品？':'Delete this food?'}</h2><p>${getLanguage()==='zh'?'此食品會永久從 My Food 移除，不會進入過去紀錄。此操作無法復原。':'This permanently removes the item from My Food without moving it into Past Records. This cannot be undone.'}</p><button type="button" class="button danger" data-action="confirm-food-delete">${getLanguage()==='zh'?'確認刪除':'Delete Food'}</button>${btn('cancel','modal-close','','outline')}`;
  if(m.type==='food-end')content=`<h2>${t('confirmEnd')}</h2><p>${t('confirmEndHelp')}</p><p><strong>${t(m.status)}</strong></p>${btn('saveChanges','confirm-food-end',m.status)}${btn('cancel','modal-close','','outline')}`;
  if(m.type==='zero')content=`<h2>${t('confirmZero')}</h2>${btn('usedUp','confirm-zero')}${btn('cancel','modal-close','','outline')}`;
@@ -91,7 +109,7 @@ function modalBody(){const m=modal;if(!m)return '';let content;
  if(m.type==='reset')content=`<h2>${t('resetTitle')}</h2><p>${t('resetHelp')}</p>${btn('confirmReset','confirm-reset','','danger')}${btn('cancel','modal-close','','outline')}`;
  if(m.type==='switch'){const it=store.state.purchaseItems.find(x=>x.id===current.id),p=store.state.purchases.find(x=>x.id===it.purchaseId);content=`<h2>${t('switchItem')}</h2>`+p.itemIds.map(id=>{const item=store.state.purchaseItems.find(x=>x.id===id),st=getStory(store.state,id);return `<button class="food-card" data-go="story" data-id="${esc(id)}"><span class="grow"><strong>${esc(item.name)}</strong><small>${t(st.status)}</small></span></button>`;}).join('')+btn('close','modal-close','','outline');}
  if(store.pending&&store.status==='save_failed')content=`<div class="notice error" role="alert">${t(store.error||'saveError')}${btn('retry','retry','','outline')}${['conflict','epochError'].includes(store.error)?btn('reloadSaved','reload','','outline'):''}</div>`+content;
- return `<dialog id="modal" aria-label="${t(m.type==='draft'?'draftTitle':m.type==='revise'?'reviseTitle':m.type==='reset'?'resetTitle':m.type==='switch'?'switchItem':m.type==='food-end'?'confirmEnd':m.type==='zero'?'confirmZero':'addFood')}">${content}</dialog>`;
+ return `<dialog id="modal" class="${m.type==='add-food'?'add-food-dialog':''}" ${m.type==='add-food'?'tabindex="-1"':''} aria-label="${t(m.type==='draft'?'draftTitle':m.type==='revise'?'reviseTitle':m.type==='reset'?'resetTitle':m.type==='switch'?'switchItem':m.type==='food-end'?'confirmEnd':m.type==='zero'?'confirmZero':'addFood')}">${content}</dialog>`;
 }
 function validReduction(raw){try{reductionQty(raw,store.state.purchaseItems.find(x=>x.id===current.id).quantity);return true;}catch{return false;}}
 function invalidBinding(error){
@@ -119,7 +137,7 @@ function render(){
  if(store.pending&&store.status!=='saving')document.querySelectorAll('button').forEach(el=>{if(!['retry','reload'].includes(el.dataset.action))el.disabled=true;});
  cleanupFeed=store.pending?()=>{}:bindFeed($('#food-drag'),$('#feed-target'),()=>performAction(),key=>{message=key;render();});
  document.querySelectorAll('img').forEach(img=>{img.addEventListener('error',()=>{const span=document.createElement('span');span.className='asset-fallback';span.textContent=t('assetError');img.replaceWith(span);},{once:true});});
- if(modal){const d=$('#modal');d.showModal();d.addEventListener('cancel',ev=>{ev.preventDefault();if(!store.pending&&store.status!=='saving')closeModal();});}
+ if(modal){const d=$('#modal');d.showModal();if(modal.type==='add-food')d.focus({preventScroll:true});d.addEventListener('cancel',ev=>{ev.preventDefault();if(!store.pending&&store.status!=='saving')closeModal();});}
  if(focus&&!modal){const el=[...document.querySelectorAll('[data-bind]')].find(x=>x.dataset.bind===focus);el?.focus({preventScroll:true});try{el?.setSelectionRange(selection,selection);}catch{}}
  window.scrollTo(0,scroll);if(['receipt-camera','product-camera'].includes(current.page))startCamera();
  if(store.error&&!modal){const binding=invalidBinding(store.error);const el=[...document.querySelectorAll('[data-bind]')].find(x=>x.dataset.bind===binding);if(el){el.setAttribute('aria-invalid','true');el.setAttribute('aria-describedby','error');el.focus();el.scrollIntoView({block:'center'});}else $('#error')?.focus();}
@@ -128,53 +146,127 @@ function setBound(path,value){if(!editor)return;const keys=path.split('.');let o
 function saveDraft(done=()=>{}){
  if(!editor)return;
  const e=editor;
- const success=()=>{if(editor===e){markBaseline();e.blob=null;}done();};
- if(e.type==='cart')return store.commit('cart_save',{rows:e.rows},[],success);
+ const success=()=>{if(editor===e){markBaseline();e.blob=null;e.productBlob=null;}done();};
+ if(e.type==='cart'){
+  const photoMedia=e.productBlob&&e.productImageId?[{id:e.productImageId,blob:e.productBlob}]:[];
+  return store.commit('cart_save',{rows:e.rows},photoMedia,success);
+ }
  if(e.type==='receipt')return store.commit('receipt_save',{id:e.id,rows:e.rows,imageId:e.imageId,sample:e.sample,qrPayload:e.qrPayload,receiptId:e.receiptId,storeName:e.storeName,receiptTotal:e.receiptTotal},e.blob?[{id:e.imageId,blob:e.blob}]:[],success);
  if(e.type==='custom')return store.commit('custom_save',{draftId:e.draftId,itemId:current.id,fields:e.fields},[],success);
 }
 async function performAction(){message='';if(store.pending||playing||store.status==='saving')return;const st=getStory(store.state,current.id);if(st?.currentStep!=='action_ready')return;const actionId=st.activeActionId;const itemId=current.id;const action=store.state.storyActions.find(x=>x.id===actionId);const epoch=store.state.epoch;
  await store.commit('action_apply',{itemId,actionId,...(['feed','share'].includes(action.kind)?{selectedQuantity:editor.fields.selectedQuantity}:{})},[],()=>{if(current.page!=='story'||current.id!==itemId||store.state.epoch!==epoch)return;playing=actionId;phase='receive';animator.play(epoch+':'+actionId,action.kind,p=>{if(current.id===itemId&&playing===actionId){phase=p;const stage=$('.story-stage');if(stage)stage.dataset.phase=p;const live=$('.motion-live');if(live)live.textContent=t(action.kind==='feed'?(p==='enjoy'&&store.state.purchaseItems.find(x=>x.id===itemId)?.asset==='milk'?'sipping':p):resultKey(action.kind));if(p==='finish')render();}},()=>{if(current.id===itemId&&playing===actionId){playing=null;phase='result';render();}});});
 }
-function stopCamera(){if(cameraStream){for(const track of cameraStream.getTracks())track.stop();cameraStream=null;} }
-async function startCamera(){const el=document.getElementById('camera-video');if(!el)return;
- if(cameraStream){el.srcObject=cameraStream;el.closest('.camera-stage')?.classList.add('has-video');return;}
- try{if(!navigator.mediaDevices?.getUserMedia)throw Error('camera');const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}});if(!document.getElementById('camera-video')){stream.getTracks().forEach(t=>t.stop());return;}cameraStream=stream;const target=document.getElementById('camera-video');target.srcObject=stream;await target.play().catch(()=>{});target.closest('.camera-stage')?.classList.add('has-video');cameraUnavailable=false;}
- catch{cameraUnavailable=true;const target=document.querySelector('.camera-placeholder');if(target)target.classList.add('camera-fallback');}
+function stopCamera(){
+ cameraRequest++; // Invalidate getUserMedia promises that are still awaiting a mobile permission dialog.
+ if(cameraStream){for(const track of cameraStream.getTracks())track.stop();cameraStream=null;}
 }
-async function captureFrame(kind){const video=document.getElementById('camera-video');if(!cameraStream||!video?.videoWidth){document.getElementById(kind==='receipt'?'receipt-camera':'product-camera')?.click();return;}
- const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.92));if(!blob)return;const file=new File([blob],kind+'-'+Date.now()+'.jpg',{type:'image/jpeg'});if(kind==='receipt')await chooseImage(file);else await chooseProductImage(file);
+async function startCamera(){
+ const el=document.getElementById('camera-video');if(!el||cameraStream)return;
+ if(cameraUnavailable){
+  document.querySelector('.camera-placeholder')?.classList.add('camera-fallback');
+  document.querySelector('.camera-bar')?.classList.add('native-capture');
+  return;
+ }
+ const request=++cameraRequest;
+ try{
+  if(!navigator.mediaDevices?.getUserMedia)throw Error('camera');
+  const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}});
+  const target=document.getElementById('camera-video');
+  if(request!==cameraRequest||!target||!['receipt-camera','product-camera'].includes(current.page)){
+   stream.getTracks().forEach(track=>track.stop());return;
+  }
+  cameraStream=stream;target.srcObject=stream;
+  await target.play().catch(()=>{});
+  target.closest('.camera-stage')?.classList.add('has-video');cameraUnavailable=false;
+ }catch{
+  if(request!==cameraRequest)return;
+  cameraUnavailable=true;
+  document.querySelector('.camera-placeholder')?.classList.add('camera-fallback');
+  // Native capture uses the user's real tap on the shutter when a live camera is unavailable.
+  document.querySelector('.camera-bar')?.classList.add('native-capture');
+ }
 }
+async function captureFrame(kind){
+ const video=document.getElementById('camera-video');
+ if(!cameraStream||!video?.videoWidth){
+  document.getElementById(kind==='receipt'?'receipt-camera':'product-camera')?.click();return;
+ }
+ const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+ canvas.getContext('2d').drawImage(video,0,0);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.92));
+ if(!blob){message='scanUnreadable';render();return;}
+ const file=new File([blob],kind+'-'+Date.now()+'.jpg',{type:'image/jpeg'});
+ if(kind==='receipt')await chooseImage(file);else await chooseProductImage(file);
+}
+function photoStillCurrent(ref,token){return editor===ref&&token===previewToken;}
+function photoMessage(error){return ['scanNotFound','scanWrongCode','scanUnsupported'].includes(error?.code||error?.message)?'no_match':'scan_error';}
 async function chooseImage(file){
  if(!file)return;
- const ref=editor,token=++previewToken,epoch=store.state.epoch;
- generating=true;message='scanWorking';render();
+ const ref=editor,token=++previewToken;
+ let url;
+ try{
+  // Preview FIRST. A receipt without a known QR must never make a successful photo disappear.
+  url=await receiptServices.decode(file);
+  if(!photoStillCurrent(ref,token)){URL.revokeObjectURL(url);return;}
+  if(ref.imageUrl)URL.revokeObjectURL(ref.imageUrl);
+  Object.assign(ref,{imageUrl:url,imageId:uid(),blob:file,photoStatus:'scanning',photoIssue:'',rows:[],
+   sample:false,qrPayload:null,receiptId:null,storeName:null,receiptTotal:null});
+  stopCamera();current={page:'receipt',id:ref.id};history.pushState(null,'',path('receipt',ref.id));
+  message='';render();window.scrollTo(0,0);
+ }catch(error){
+  if(!photoStillCurrent(ref,token))return;
+  message=error.message||'previewError';render();return;
+ }
  try{
   const codes=await decodeQRPhoto(file);
-  const url=await receiptServices.decode(file);
-  if(editor!==ref||token!==previewToken||store.state.epoch!==epoch){URL.revokeObjectURL(url);return;}
+  if(!photoStillCurrent(ref,token))return;
   const match=codes.map(code=>catalog.receipt(code)).find(Boolean);
-  if(!match){URL.revokeObjectURL(url);throw Error('scanWrongCode');}
-  if(store.state.receiptImports.some(x=>x.status==='confirmed'&&x.qrPayload===match.qr_payload)){URL.revokeObjectURL(url);throw Error('alreadyImported');}
-  if(editor.imageUrl)URL.revokeObjectURL(editor.imageUrl);
-  Object.assign(editor,{imageUrl:url,imageId:uid(),blob:file,sample:false,
-    qrPayload:match.qr_payload,receiptId:match.receipt_id,storeName:match.store,
-    receiptTotal:match.total,rows:catalog.receiptRows(match,uid)});
-  message='';if(current.page==='receipt-camera'){stopCamera();current={page:'receipt',id:editor.id};history.pushState(null,'',path('receipt',editor.id));}
- }catch(error){message=error.code||error.message||'scanFailed';}
- finally{generating=false;if(editor===ref)render();}
+  if(!match){ref.photoIssue='no_match';ref.photoStatus='ready';}
+  else if(store.state.receiptImports.some(x=>x.status==='confirmed'&&x.qrPayload===match.qr_payload)){
+   ref.photoIssue='duplicate';ref.photoStatus='ready';ref.qrPayload=null;
+  }else{
+   Object.assign(ref,{qrPayload:match.qr_payload,receiptId:match.receipt_id,storeName:match.store,
+    receiptTotal:match.total,rows:catalog.receiptRows(match,uid),photoStatus:'ready',photoIssue:''});
+  }
+ }catch(error){
+  if(!photoStillCurrent(ref,token))return;
+  ref.photoStatus='ready';ref.photoIssue=photoMessage(error);
+ }finally{
+  if(photoStillCurrent(ref,token)){
+   render();
+   // Save this receipt photo locally without adding anything to My Food.
+   // The user must still confirm every item before importing.
+   if(ref.blob&&!store.pending)await saveDraft();
+  }
+ }
 }
 async function chooseProductImage(file){
- if(!file)return;const ref=editor,token=++previewToken;generating=true;message='scanWorking';render();
+ if(!file)return;
+ const ref=editor,token=++previewToken;
+ let url;
  try{
-  const codes=await decodeQRPhoto(file);const match=codes.map(code=>catalog.product(code)).find(Boolean);
-  if(ref!==editor||token!==previewToken)return;
-  if(!match)throw Error('scanWrongCode');
-  const row=editor.rows.find(x=>x.cartItemId===current.id);if(!row)return;
-  Object.assign(row,catalog.cartRow(match,()=>row.cartItemId));editor.scannedProduct=match;
-  if(editor.productPhotoUrl)URL.revokeObjectURL(editor.productPhotoUrl);
-  editor.productPhotoUrl=URL.createObjectURL(file);message='';stopCamera();current={page:'product-review',id:row.cartItemId};history.pushState(null,'',path(current.page,current.id));
- }catch(error){message='productRecognitionUnavailable';}finally{generating=false;if(ref===editor)render();}
+  url=await receiptServices.decode(file);
+  if(!photoStillCurrent(ref,token)){URL.revokeObjectURL(url);return;}
+  const row=ref.rows.find(x=>x.cartItemId===current.id);if(!row){URL.revokeObjectURL(url);return;}
+  if(ref.productPhotoUrl)URL.revokeObjectURL(ref.productPhotoUrl);
+  ref.productPhotoUrl=url;ref.productBlob=file;ref.productImageId=uid();row.photoId=ref.productImageId;
+  ref.photoStatus='scanning';ref.photoIssue='';ref.scannedProduct=null;
+  stopCamera();current={page:'product-review',id:row.cartItemId};history.pushState(null,'',path(current.page,current.id));
+  message='';render();window.scrollTo(0,0);
+ }catch(error){
+  if(!photoStillCurrent(ref,token))return;
+  message=error.message||'previewError';render();return;
+ }
+ try{
+  const codes=await decodeQRPhoto(file);
+  if(!photoStillCurrent(ref,token))return;
+  const match=codes.map(code=>catalog.product(code)).find(Boolean);
+  const row=ref.rows.find(x=>x.cartItemId===current.id);if(!row)return;
+  if(match){const photoId=row.photoId;Object.assign(row,catalog.cartRow(match,()=>row.cartItemId),{photoId});ref.scannedProduct=match;ref.photoIssue='';}
+  else ref.photoIssue='no_match';
+ }catch(error){if(photoStillCurrent(ref,token))ref.photoIssue=photoMessage(error);}
+ finally{if(photoStillCurrent(ref,token)){ref.photoStatus='ready';render();}}
 }
 function applyCatalogProduct(id){
  const product=catalog.getProduct(id);if(!product)return;
