@@ -1,0 +1,5 @@
+/* v13.3: Inputs stay in the DOM when camera sheets suspend the webview. */
+.persistent-photo-input{position:fixed!important;top:-150px!important;left:-150px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;z-index:-1!important}
+/* Buttons and labels remain large enough for an iPhone touch target. */
+.camera-bar .camera-album,.camera-bar .native-shutter{cursor:pointer;touch-action:manipulation}
+.captured-photo .photo-scan-status{overflow-wrap:anywhere;line-height:1.5}
