@@ -34,7 +34,7 @@ test('ENTRY: EVERY document open, including existing guest and all URL hashes, s
  assert.equal(initialPage(),'welcome');
  assert.equal(entryPage('home',true),'home');
  const main=readFileSync(path,'utf8');
- assert.match(main,/async function boot\(\)[\s\S]*?guestEnteredThisLaunch=false;[\s\S]*?current=\{page:initialPage\(\),id:''\}/);
+ assert.match(main,/async function boot\(\)[\s\S]*?guestEnteredThisLaunch=!!store.repository.user/);
  assert.doesNotMatch(main,/localStorage\.setItem\(ONBOARDING_KEY,'guest'\)/);
 });
 test('PRICING: quantity 2 estimated TOTAL $30, Buy Less final 1, saves $15 and spends $15',()=>{

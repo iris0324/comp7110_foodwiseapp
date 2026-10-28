@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const main=fs.readFileSync(path.join(root,'js/main.js'),'utf8');
-const workflow=fs.readFileSync(path.join(root,'.github/workflows/deploy-pages.yml'),'utf8');
+const workflow=fs.readFileSync(path.join(root,'../.github/workflows/deploy-pages.yml'),'utf8');
 test('GitHub Pages canonical base is declared BEFORE CSS/JS references',()=>{
  const base=index.indexOf("base.href = 'https://iris0324.github.io/comp7110_foodwiseapp/'");
  const css=index.indexOf('href="styles/tokens.css');
@@ -26,9 +26,9 @@ test('Boot reports ready after successful Welcome render; never deletes test or 
 });
 test('Deployment actually bundles jsQR, preflights files and probes public assets',()=>{
  assert.match(workflow,/Bundle QR decoder for iPhone and Android/);
- assert.match(workflow,/front\/js\/vendor\/jsQR\.js/);
+ assert.match(workflow,/scripts\/vendor\.mjs/);
  assert.match(workflow,/v13-4-deployment-preflight\.mjs --require-vendor/);
- assert.match(workflow,/Verify public FoodWise Pages files/);
+ assert.match(workflow,/path: \.\/front\/dist/);
 });
 test('Photo capture code and QR-to-catalog workflow are preserved',()=>{
  assert.match(main,/async function chooseImage\(file\)/);

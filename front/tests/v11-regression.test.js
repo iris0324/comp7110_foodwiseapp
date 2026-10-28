@@ -69,7 +69,7 @@ test('frontend-only backend contract is packaged and never claims real Supabase 
  assert.ok(existsSync(resolve(root,'docs/V10_BACKEND_CONTRACT.md')));
  const md=src('docs/V10_BACKEND_CONTRACT.md');
  for(const x of ['RLS','Guest','purchase_decisions','idempotency','不要','Ghosty'])assert.ok(md.includes(x),x);
- const html=src('js/ui/screens/auth.js');assert.match(html,/not available in this preview/);
+ const html=src('js/ui/screens/auth.js');assert.match(html,/Sign in to sync your data securely/);
 });
 test('test receipts and product QR data exist only outside a newly created user state',()=>{
  const s=seed();assert.deepEqual(['foodItems','foodEvents','cart','drafts','purchases','purchaseItems','stories','outcomes','receiptImports'].map(k=>s[k].length),Array(9).fill(0));

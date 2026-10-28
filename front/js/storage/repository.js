@@ -1,11 +1,40 @@
-import {CONFIG} from '../config.js?v=13.0';
+import {Repository as LocalRepository} from './local-repository.js?v=13.0';
+import {supabase} from '../services/supabase.js';
 import {seed} from '../data/seed.js?v=13.0';
 import {executeCommand,normalizeState} from '../domain/commands.js?v=13.0';
+
 export class Repository {
- constructor(name=CONFIG.dbName){this.name=name;this.db=null;this.failure=null;}
- async open(){this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open(this.name,1);r.onupgradeneeded=()=>{r.result.createObjectStore('app');r.result.createObjectStore('media');};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(Error('initError'));r.onblocked=()=>reject(Error('blocked'));});this.db.onversionchange=()=>this.db.close();return this.load(true);}
- load(initialize=false){return new Promise((resolve,reject)=>{const tx=this.db.transaction('app',initialize?'readwrite':'readonly'),store=tx.objectStore('app');let state;const r=store.get('snapshot');r.onsuccess=()=>{state=r.result;if(!state&&initialize){state=seed('en',crypto.randomUUID());store.put(state,'snapshot');}if(state&&state.schemaVersion!==CONFIG.schemaVersion){state=null;tx.abort();}};tx.oncomplete=()=>state?resolve(normalizeState(state)):reject(Error('schemaError'));tx.onabort=()=>reject(Error('schemaError'));tx.onerror=()=>{};});}
- commitCommand(command,media=[]){return new Promise((resolve,reject)=>{let out,error;const tx=this.db.transaction(['app','media'],'readwrite');const r=tx.objectStore('app').get('snapshot');r.onsuccess=()=>{try{out=executeCommand(r.result,command);if(this.failure){const reason=this.failure;this.failure=null;throw Error(reason);}if(!out.replayed){if(command.type==='reset')tx.objectStore('media').clear();for(const m of media)tx.objectStore('media').put(m.blob,m.id);tx.objectStore('app').put(out.state,'snapshot');}}catch(e){error=e;tx.abort();}};tx.oncomplete=()=>resolve(out);tx.onabort=()=>reject(error||Error('saveError'));tx.onerror=()=>{};});}
- getMedia(id){return new Promise((resolve,reject)=>{const tx=this.db.transaction('media');let blob;const r=tx.objectStore('media').get(id);r.onsuccess=()=>blob=r.result;tx.oncomplete=()=>resolve(blob);tx.onabort=()=>reject(Error('previewError'));});}
- close(){this.db?.close();}
+ constructor(){this.name='FoodWise-cloud';this.local=null;this.user=null;this.failure=null;}
+ async open(){
+  if(supabase){const {data,error}=await supabase.auth.getSession();if(error)throw error;this.user=data.session?.user||null;}
+  if(!this.user){this.local=new LocalRepository();return this.local.open();}
+  this.local?.close();this.local=null;
+  return this.load(true);
+ }
+ async load(){
+  if(!this.user)return this.local.load();
+  const {data,error}=await supabase.rpc('foodwise_load',{initial_state:seed('en',crypto.randomUUID())});
+  if(error)throw error;
+  return normalizeState(data);
+ }
+ async commitCommand(command,media=[]){
+  if(!this.user)return this.local.commitCommand(command,media);
+  const owner=this.user.id;
+  const current=await this.load();
+  const out=executeCommand(current,command);
+  if(out.replayed)return out;
+  if(this.failure){const reason=this.failure;this.failure=null;throw Error(reason);}
+  const uploads=await Promise.all(media.map(async m=>({id:m.id,type:m.blob.type,data:await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(m.blob);})})));
+  if(this.user?.id!==owner)throw Error('sessionChanged');
+  const {error}=await supabase.rpc('foodwise_save',{expected_revision:current.revision,expected_epoch:current.epoch,next_state:out.state,uploads,clear_media:command.type==='reset'});
+  if(error)throw Error(error.message.includes('conflict')?'conflict':error.message);
+  return out;
+ }
+ async getMedia(id){
+  if(!this.user)return this.local.getMedia(id);
+  const {data,error}=await supabase.from('foodwise_media').select('data,mime_type').eq('id',id).eq('user_id',this.user.id).maybeSingle();
+  if(error)throw error;if(!data)return null;
+  return new Blob([Uint8Array.from(atob(data.data),c=>c.charCodeAt(0))],{type:data.mime_type});
+ }
+ close(){this.local?.close();}
 }

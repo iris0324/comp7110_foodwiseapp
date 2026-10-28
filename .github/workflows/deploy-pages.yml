@@ -38,6 +38,32 @@ jobs:
         with:
           enablement: true
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - name: Bundle QR decoder for iPhone and Android
+        working-directory: front
+        run: |
+          npm ci
+          node scripts/vendor.mjs
+          test -s js/vendor/jsQR.js
+          node tests/v13-4-deployment-preflight.mjs --require-vendor
+
+      - name: Build and test
+        working-directory: front
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          npm test
+          npm run test:backend
+          npm run test:live
+          npm run build
+          node scripts/check-dist.mjs
+
       - name: Check frontend entry
         run: |
           test -f front/index.html
@@ -46,7 +72,7 @@ jobs:
       - name: Upload FoodWise frontend
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./front
+          path: ./front/dist
 
       - name: Deploy to GitHub Pages
         id: deployment

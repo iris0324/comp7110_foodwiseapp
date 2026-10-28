@@ -25,13 +25,13 @@ test('all auth routes remain available without a guest session',()=>{
 });
 test('every browser document begins at Welcome regardless of prior guest status or URL hash',()=>{
  assert.match(main,/guestEnteredThisLaunch=false/);
- assert.match(main,/current=\{page:initialPage\(\),id:''\}/);
- assert.match(main,/history\.replaceState\(null,'',path\(initialPage\(\)\)\)/);
+ assert.match(main,/guestEnteredThisLaunch=!!store.repository.user/);
+ assert.match(main,/history\.replaceState\(null,'',path\(page\)\)/);
  assert.match(main,/entryPage\(page,guestEnteredThisLaunch\)/);
  assert.match(main,/entryPage\(next\.page,guestEnteredThisLaunch\)/);
  assert.doesNotMatch(main,/localStorage\.setItem\(ONBOARDING_KEY,'guest'\)/);
  assert.match(main,/if\(name==='enter-guest'\)\{guestEnteredThisLaunch=true/);
- assert.match(main,/if\(name==='exit-guest'\)\{guestEnteredThisLaunch=false/);
+ assert.match(main,/supabase.auth.signOut\(\)/);
  assert.ok(main.includes('data-action="exit-guest"'));
  assert.equal(ONBOARDING_KEY,'fw-onboarding-v11-1');
 });
@@ -42,5 +42,5 @@ test('Welcome includes all three entrances in both languages',()=>{
  for(const s of ['歡迎來到 FoodWise','建立帳號','登入','以訪客身份繼續'])assert.ok(html.includes(s),s);
 });
 test('project contains explicit corrected VS Code start guide',()=>{
- assert.ok(existsSync(resolve(root,'START_HERE_V11_1.md')));
+ assert.ok(existsSync(resolve(root,'../README.md')));
 });

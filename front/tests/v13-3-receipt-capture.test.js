@@ -9,7 +9,7 @@ const read=p=>readFileSync(new URL(p,root),'utf8');
 const html=read('index.html'),main=read('js/main.js'),food=read('js/ui/screens/food.js');
 const ghost=read('js/ui/screens/ghost-v8.js'),scanner=read('js/scanners/qr-scanner.js');
 const worker=read('js/scanners/qr-worker.js');
-const deploy=read('.github/workflows/deploy-pages.yml');
+const deploy=read('../.github/workflows/deploy-pages.yml');
 
 test('photograph becomes visible immediately: preview creation never waits for QR decode',async()=>{
  const old=globalThis.URL;
@@ -55,9 +55,9 @@ test('scanner uses on-device worker and cannot wait indefinitely for a scan',()=
 
 test('published GitHub Pages includes a real local QR decoder, not only README',()=>{
  assert.match(deploy,/Bundle QR decoder for iPhone and Android/);
- assert.match(deploy,/jsqr@1\.4\.0\/dist\/jsQR\.js/);
- assert.match(deploy,/front\/js\/vendor\/jsQR\.js/);
- assert.match(deploy,/test -s front\/js\/vendor\/jsQR\.js/);
+ assert.match(read('package.json'),/"jsqr": \"[~^]?1\.4\.0\"/);
+ assert.match(deploy,/scripts\/vendor\.mjs/);
+ assert.match(deploy,/test -s js\/vendor\/jsQR\.js/);
  assert.match(deploy,/path: \.\/front/);
  assert.match(html,/js\/main\.js\?v=13\.(?:3|4|5)/);
 });

@@ -1,0 +1,6 @@
+node_modules/
+front/dist/
+.env*
+!.env.example
+front/js/vendor/jsQR.js
+front/js/vendor/jsQR.LICENSE.txt
