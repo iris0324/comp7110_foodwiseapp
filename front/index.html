@@ -1,6 +1,54 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#FFF9F6"><meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"><title>FoodWise</title><link rel="icon" href="assets/ghosty/happy.png"><link rel="stylesheet" href="styles/tokens.css?v=6.3"><link rel="stylesheet" href="styles/base.css?v=6.3"><link rel="stylesheet" href="styles/components.css?v=6.3"><link rel="stylesheet" href="styles/screens.css?v=6.3"><link rel="stylesheet" href="styles/motion.css?v=6.3"><link rel="stylesheet" href="styles/peach-jam.css?v=peach1">
-<link rel="stylesheet" href="styles/integration.css?v=7.0"><link rel="stylesheet" href="styles/refinement-v8.css?v=8.0"><link rel="stylesheet" href="styles/refinement-v9.css?v=9.0"><link rel="stylesheet" href="styles/cream-patisserie-v10.css?v=10.0"><link rel="stylesheet" href="styles/cream-v12-qa.css?v=12.0"><link rel="stylesheet" href="styles/cream-v13.css?v=13.0"><link rel="stylesheet" href="styles/photo-v13-1.css?v=13.1"><link rel="stylesheet" href="styles/receipt-v13-3.css?v=13.3"></head><body><div id="app"><main class="loading">Welcome to FoodWise · 歡迎來到 FoodWise</main></div>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#FFF9F6"><meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"><title>FoodWise</title>
+<!-- v13.4: GitHub project pages serve front/ as the site root. Absolute Pages
+     base prevents an old /front/ bookmark or in-app browser path from making
+     EVERY stylesheet and ES module resolve to a nonexistent location. -->
+<script>
+(function () {
+  if (location.hostname.toLowerCase() === 'iris0324.github.io') {
+    var base = document.createElement('base');
+    base.href = 'https://iris0324.github.io/comp7110_foodwiseapp/';
+    document.head.appendChild(base);
+  }
+  window.__foodwiseReady = false;
+  window.__foodwiseMissingAssets = [];
+  window.__foodwiseShowStartupFailure = function () {
+    if (window.__foodwiseStartupShown || window.__foodwiseReady && !window.__foodwiseMissingAssets.length) return;
+    window.__foodwiseStartupShown = true;
+    var el = document.getElementById('app');
+    if (!el) return;
+    el.innerHTML = '<main class="loading fw-startup-failure" role="alert">'
+      + '<img class="fw-startup-ghost" src="assets/ghosty/worried.png" alt="" />'
+      + '<h1>FoodWise could not finish loading</h1>'
+      + '<p>Some app files did not load. Your FoodWise data has not been deleted.</p>'
+      + '<p class="fw-startup-hint">Please open the official FoodWise link again. If this continues, check the latest GitHub Pages deployment.</p>'
+      + '<p><a class="fw-retry" href="https://iris0324.github.io/comp7110_foodwiseapp/?retry=' + Date.now() + '">Open FoodWise again</a></p>'
+      + '</main>';
+  };
+  window.addEventListener('error', function (event) {
+    var target = event.target;
+    if (!target || !['SCRIPT', 'LINK'].includes(target.tagName)) return;
+    window.__foodwiseMissingAssets.push(target.src || target.href || 'unknown');
+  }, true);
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (!window.__foodwiseReady || window.__foodwiseMissingAssets.length) window.__foodwiseShowStartupFailure();
+    }, 7000);
+  });
+})();
+</script>
+<!-- A tiny reliable loading style: even if all external CSS fails on iOS,
+     the user sees an intelligible page instead of a bare line of text. -->
+<style>
+  html,body{margin:0;min-height:100%;background:#FFF9F6;color:#75646D;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .loading{box-sizing:border-box;margin:16vh auto 0;max-width:420px;padding:28px;text-align:center;font:inherit}
+  .loading h1{font-size:22px;line-height:1.35;margin:12px 0;color:#75646D}
+  .loading p{font-size:14px;line-height:1.6}
+  .fw-retry{display:inline-block;padding:13px 20px;background:#DDA5B6;color:#fff;border-radius:14px;font-weight:700;text-decoration:none}
+  .fw-startup-ghost{width:90px;height:90px;object-fit:contain}
+  .persistent-photo-input{position:fixed!important;left:-150px!important;top:-150px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+</style><link rel="icon" href="assets/ghosty/happy.png"><link rel="stylesheet" href="styles/tokens.css?v=6.3"><link rel="stylesheet" href="styles/base.css?v=6.3"><link rel="stylesheet" href="styles/components.css?v=6.3"><link rel="stylesheet" href="styles/screens.css?v=6.3"><link rel="stylesheet" href="styles/motion.css?v=6.3"><link rel="stylesheet" href="styles/peach-jam.css?v=peach1">
+<link rel="stylesheet" href="styles/integration.css?v=7.0"><link rel="stylesheet" href="styles/refinement-v8.css?v=8.0"><link rel="stylesheet" href="styles/refinement-v9.css?v=9.0"><link rel="stylesheet" href="styles/cream-patisserie-v10.css?v=10.0"><link rel="stylesheet" href="styles/cream-v12-qa.css?v=12.0"><link rel="stylesheet" href="styles/cream-v13.css?v=13.0"><link rel="stylesheet" href="styles/photo-v13-1.css?v=13.1"><link rel="stylesheet" href="styles/receipt-v13-3.css?v=13.4"></head><body><div id="app"><main class="loading">Welcome to FoodWise · 歡迎來到 FoodWise</main></div>
 <!-- Persistent file inputs are deliberately OUTSIDE #app. When iOS opens its
      native camera, FoodWise may re-render on focus: re-rendering must never
      destroy the input whose change event carries the photograph. -->
@@ -8,4 +56,4 @@
 <input id="receipt-image" class="persistent-photo-input" type="file" accept="image/*" aria-label="Choose receipt photo from album" tabindex="-1">
 <input id="product-camera" class="persistent-photo-input" type="file" accept="image/*" capture="environment" aria-label="Take product photo" tabindex="-1">
 <input id="product-image" class="persistent-photo-input" type="file" accept="image/*" aria-label="Choose product photo from album" tabindex="-1">
-<script type="module" src="js/main.js?v=13.3"></script></body></html>
+<script type="module" src="js/main.js?v=13.4" onerror="window.__foodwiseShowStartupFailure()"></script></body></html>

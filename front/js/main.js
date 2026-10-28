@@ -450,7 +450,7 @@ async function boot(){try{await catalog.load();await store.open();setLanguage(st
  localStorage.removeItem(ONBOARDING_KEY); // remove only obsolete entry flag
  current={page:initialPage(),id:''};
  history.replaceState(null,'',path(initialPage()));
- prepareEditor(current);render();checkPhoneReminders();}catch(error){$('#app').innerHTML=`<main class="loading"><h1>FoodWise</h1><p role="alert">${t(error.message)||t('scanCatalogError')}</p><button id="retry-open" class="button">${t('retryOpen')}</button></main>`;$('#retry-open').onclick=boot;}}
+ prepareEditor(current);render();window.__foodwiseReady=true;checkPhoneReminders();}catch(error){window.__foodwiseReady=true;$('#app').innerHTML=`<main class="loading"><h1>FoodWise</h1><p role="alert">${t(error.message)||t('scanCatalogError')}</p><button id="retry-open" class="button">${t('retryOpen')}</button></main>`;$('#retry-open').onclick=boot;}}
 boot();
 // Preload the motion sheet and poses; a failed asset cannot alter business progress.
 ['sprite-enjoy-frames-v2','sprite-sip','sprite-store','sprite-share-neutral'].forEach(asset=>{const image=new Image();image.onerror=()=>{if(asset==='sprite-enjoy-frames-v2'){motionSheetAvailable=false;if(store.state)render();}};image.src='assets/'+asset+'.png';});
