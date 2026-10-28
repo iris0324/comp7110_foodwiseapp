@@ -5,7 +5,7 @@ import {entryPage,initialPage,ONBOARDING_KEY} from './app/onboarding.js?v=13.0';
 import {clone,uid,money,cents,half,qty,sub,cmp,daysUntil,today,reductionQty} from './core/values.js?v=13.0';
 import {cartFields,foodFields} from './domain/commands.js?v=13.0';
 import {getStory,getOutcome} from './domain/selectors.js?v=13.0';
-import {receiptServices} from './domain/receipt.js?v=13.1';
+import {receiptServices} from './domain/receipt.js?v=13.3';
 import {t,setLanguage,getLanguage} from './i18n/index.js?v=13.0';
 import {esc,$} from './ui/dom.js?v=13.0';
 import {icon,title,btn,nav,notice,sprite,resultKey,reductionSummary} from './ui/components.js?v=13.0';
@@ -16,7 +16,7 @@ import {authScreen} from './ui/screens/auth.js?v=13.0';
 import {bindFeed} from './interaction/feed.js?v=13.0';
 import {Animator} from './interaction/animator.js?v=13.0';
 import {CatalogService} from './services/catalog-service.js?v=13.0';
-import {decodeQRPhoto} from './scanners/qr-scanner.js?v=13.2';
+import {decodeQRPhoto} from './scanners/qr-scanner.js?v=13.3';
 const store=new Store(new Repository());
 const catalog=new CatalogService();
 const animator=new Animator();
@@ -200,7 +200,7 @@ async function captureFrame(kind){
  if(kind==='receipt')await chooseImage(file);else await chooseProductImage(file);
 }
 function photoStillCurrent(ref,token){return editor===ref&&token===previewToken;}
-function photoMessage(error){return ['scanNotFound','scanWrongCode','scanUnsupported'].includes(error?.code||error?.message)?'no_match':'scan_error';}
+function photoMessage(error){return ['scanNotFound','scanWrongCode'].includes(error?.code||error?.message)?'no_match':'scan_error';}
 async function chooseImage(file){
  if(!file)return;
  const ref=editor,token=++previewToken;
@@ -400,7 +400,7 @@ document.addEventListener('input',event=>{const el=event.target;if(el.dataset.bi
   if(row&&target)target.innerHTML=cartPricePreview(row);
  }
  if(el.dataset.filter){filters[el.dataset.filter]=el.value;const active=el.selectionStart;render();const input=$('[data-filter="search"]');input?.focus({preventScroll:true});try{input?.setSelectionRange(active,active);}catch{}}});
-document.addEventListener('change',event=>{if(['receipt-image','receipt-camera'].includes(event.target.id))chooseImage(event.target.files[0]);if(['product-image','product-camera'].includes(event.target.id))chooseProductImage(event.target.files[0]);if(event.target.dataset.bind){setBound(event.target.dataset.bind,event.target.value);if(event.target.tagName==='SELECT')render();}});
+document.addEventListener('change',event=>{if(['receipt-image','receipt-camera'].includes(event.target.id)){const file=event.target.files?.[0];event.target.value='';if(file)chooseImage(file);}if(['product-image','product-camera'].includes(event.target.id)){const file=event.target.files?.[0];event.target.value='';if(file)chooseProductImage(file);}if(event.target.dataset.bind){setBound(event.target.dataset.bind,event.target.value);if(event.target.tagName==='SELECT')render();}});
 let handoverDrag=null;
 document.addEventListener('pointerdown',event=>{
  const food=event.target.closest('[data-handover-food]');if(!food||food.disabled||store.pending)return;

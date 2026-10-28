@@ -1,126 +1,185 @@
-/** Decode QR codes directly from the user's photo, on-device.
- * No OCR or inferred store/items: only a genuinely decoded QR can populate a receipt.
- * jsQR is primary on iOS; native BarcodeDetector and ZXing are independent fallbacks.
+/** FoodWise receipt QR scanner.
+ * Reads the pixels of a user-selected photo locally. The eight classroom QR
+ * payloads are decoded from actual images; catalog matching happens afterward.
+ * Does not claim to OCR arbitrary supermarket receipts.
  */
-export class QRScanError extends Error { constructor(code) { super(code); this.code=code; } }
+export class QRScanError extends Error {
+ constructor(code){super(code);this.code=code;}
+}
 
-let jsQRReady=null, zxingReady=null;
+let jsQRReady=null;
 function loadScript(src,timeout=4500){
  return new Promise((resolve,reject)=>{
+  if(typeof document==='undefined'){reject(Error('No document'));return;}
   const script=document.createElement('script');let settled=false;
-  const finish=(error)=>{if(settled)return;settled=true;clearTimeout(timer);script.onload=null;script.onerror=null;if(error){script.remove();reject(error);}else resolve();};
-  const timer=setTimeout(()=>finish(Error('QR library load timed out')),timeout);
-  script.src=src;script.async=true;script.onload=()=>finish();script.onerror=()=>finish(Error('QR library unavailable'));
+  const timer=setTimeout(()=>finish(Error('QR decoder load timed out')),timeout);
+  function finish(error){
+   if(settled)return;
+   settled=true;clearTimeout(timer);script.onload=null;script.onerror=null;
+   if(error){script.remove();reject(error);}else resolve();
+  }
+  script.src=src;script.async=true;
+  script.onload=()=>finish();script.onerror=()=>finish(Error('QR decoder unavailable'));
   document.head.append(script);
  });
 }
 async function ensureJsQR(){
  if(typeof globalThis.jsQR==='function')return globalThis.jsQR;
  if(!jsQRReady)jsQRReady=(async()=>{
-  try{await loadScript('js/vendor/jsQR.js',1200);}catch{}
+  try { await loadScript('js/vendor/jsQR.js',2500); }catch{}
   if(typeof globalThis.jsQR==='function')return globalThis.jsQR;
-  // Independent hosts: an iPhone may be unable to reach one CDN.
+  // Local Live Server fallback only. The GitHub deployment ships jsQR locally.
   await Promise.any([
-   loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js',5500).then(()=>{if(typeof globalThis.jsQR!=='function')throw Error('jsQR not loaded');return globalThis.jsQR;}),
-   loadScript('https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',5500).then(()=>{if(typeof globalThis.jsQR!=='function')throw Error('jsQR not loaded');return globalThis.jsQR;})
+   loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js',5500),
+   loadScript('https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',5500)
   ]).catch(()=>null);
   return typeof globalThis.jsQR==='function'?globalThis.jsQR:null;
  })();
  const result=await jsQRReady;
- if(!result)jsQRReady=null; // retry a temporary network failure next time
+ if(!result)jsQRReady=null;
  return result;
 }
-async function ensureZXing(){
- if(globalThis.ZXing?.BrowserQRCodeReader)return globalThis.ZXing;
- if(!zxingReady)zxingReady=(async()=>{
-  for(const src of ['js/vendor/zxing.min.js','https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js']){
-   try{await loadScript(src,src.startsWith('js/')?1200:5000);if(globalThis.ZXing?.BrowserQRCodeReader)return globalThis.ZXing;}catch{}
-  }
-  return null;
- })();
- const result=await zxingReady;if(!result)zxingReady=null;return result;
-}
 async function openImage(file){
- try{const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});return {image:bitmap,width:bitmap.width,height:bitmap.height,close:()=>bitmap.close?.()};}
- catch{
-  // Some iPhones can display HEIC/JPEG in an <img> but do not support createImageBitmap.
-  const url=URL.createObjectURL(file),img=new Image();
-  try{img.src=url;await img.decode();if(!img.naturalWidth)throw Error('image');return {image:img,width:img.naturalWidth,height:img.naturalHeight,close:()=>URL.revokeObjectURL(url)};}
-  catch{URL.revokeObjectURL(url);throw new QRScanError('scanUnreadable');}
+ try {
+  if(typeof createImageBitmap==='function'){
+   const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
+   return {image:bitmap,width:bitmap.width,height:bitmap.height,close:()=>bitmap.close?.()};
+  }
+ }catch{}
+ const url=URL.createObjectURL(file),img=new Image();
+ try {
+  img.src=url;
+  // Safari sometimes does not implement decode(), but onload still works.
+  if(typeof img.decode==='function') await img.decode();
+  else await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;});
+  if(!img.naturalWidth||!img.naturalHeight)throw Error('invalid dimensions');
+  return {image:img,width:img.naturalWidth,height:img.naturalHeight,close:()=>URL.revokeObjectURL(url)};
+ }catch{
+  URL.revokeObjectURL(url);throw new QRScanError('scanUnreadable');
  }
 }
-function makeCanvas(bitmap,region,maxSide=1400,rotation=0){
+function makeCanvas(image,region,maxSide=1400,rotation=0){
  const [rx,ry,rw,rh]=region;
- const sx=Math.round(rx*bitmap.width),sy=Math.round(ry*bitmap.height);
- const sw=Math.max(1,Math.min(bitmap.width-sx,Math.round(rw*bitmap.width)));
- const sh=Math.max(1,Math.min(bitmap.height-sy,Math.round(rh*bitmap.height)));
+ const sx=Math.round(rx*image.width),sy=Math.round(ry*image.height);
+ const sw=Math.max(1,Math.min(image.width-sx,Math.round(rw*image.width)));
+ const sh=Math.max(1,Math.min(image.height-sy,Math.round(rh*image.height)));
  const scale=Math.min(1,maxSide/Math.max(sw,sh));
  const w=Math.max(1,Math.round(sw*scale)),h=Math.max(1,Math.round(sh*scale));
  const rotated=rotation%180!==0;
- const canvas=document.createElement('canvas');canvas.width=rotated?h:w;canvas.height=rotated?w:h;
- const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new QRScanError('scanUnreadable');
+ const canvas=document.createElement('canvas');
+ canvas.width=rotated?h:w;canvas.height=rotated?w:h;
+ const ctx=canvas.getContext('2d',{willReadFrequently:true});
+ if(!ctx)throw new QRScanError('scanUnreadable');
  ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(rotation*Math.PI/180);
- ctx.drawImage(bitmap.image,sx,sy,sw,sh,-w/2,-h/2,w,h);
+ ctx.drawImage(image.image,sx,sy,sw,sh,-w/2,-h/2,w,h);
  return canvas;
+}
+function pixelData(canvas){
+ return canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,canvas.width,canvas.height);
 }
 function scanJsQR(canvas,decoder){
  if(!decoder)return [];
- try{const ctx=canvas.getContext('2d',{willReadFrequently:true});const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);
+ try {
+  const pixels=pixelData(canvas);
   const result=decoder(pixels.data,pixels.width,pixels.height,{inversionAttempts:'attemptBoth'});
   return result?.data?[String(result.data).trim()]:[];
  }catch{return [];}
 }
 async function scanNative(canvas,detector){
  if(!detector)return [];
- try{return (await detector.detect(canvas)).map(x=>String(x.rawValue||'').trim()).filter(Boolean);}catch{return [];}
-}
-async function scanZXing(canvas,zxing){
- if(!zxing)return [];
- try{const reader=new zxing.BrowserQRCodeReader();const result=await Promise.race([
-   reader.decodeFromImageUrl(canvas.toDataURL('image/png')),
-   new Promise((_,reject)=>setTimeout(()=>reject(Error('ZXing timeout')),2400))
-  ]);return result?.getText?.()?[String(result.getText()).trim()]:[];
+ try {
+  const values=await detector.detect(canvas);
+  return values.map(x=>String(x.rawValue||'').trim()).filter(Boolean);
  }catch{return [];}
 }
-const delayFrame=()=>new Promise(resolve=>{if(typeof requestAnimationFrame==='function')requestAnimationFrame(()=>resolve());else setTimeout(resolve,0);});
+function makeWorker(){
+ if(typeof Worker==='undefined')return null;
+ try {return new Worker(new URL('./qr-worker.js',import.meta.url),{type:'classic'});}
+ catch{return null;}
+}
+let workerId=0;
+function scanWorker(worker,canvas){
+ return new Promise(resolve=>{
+  let done=false;
+  const id=++workerId;
+  const finish=value=>{
+   if(done)return;done=true;clearTimeout(timer);
+   worker.removeEventListener('message',onMessage);worker.removeEventListener('error',onError);
+   resolve(value);
+  };
+  const onMessage=e=>{
+   if(e.data?.id!==id)return;
+   finish(e.data.status==='found'?[String(e.data.value).trim()]:['unavailable','error'].includes(e.data.status)?null:[]);
+  };
+  const onError=()=>finish(null);
+  const timer=setTimeout(()=>finish(null),4200);
+  worker.addEventListener('message',onMessage);
+  worker.addEventListener('error',onError);
+  try {
+   const pixels=pixelData(canvas);
+   worker.postMessage({id,width:pixels.width,height:pixels.height,pixels:pixels.data},[pixels.data.buffer]);
+  }catch{finish(null);}
+ });
+}
+const delayFrame=()=>new Promise(resolve=>{
+ if(typeof requestAnimationFrame==='function')requestAnimationFrame(()=>resolve());
+ else setTimeout(resolve,0);
+});
+
+/** Scan a photo for QR payloads. Errors never destroy the calling page's photo. */
 export async function decodeQRPhoto(file){
  if(!file||!(file.type?.startsWith('image/')||/\.(heic|heif|jpe?g|png|webp)$/i.test(file.name||'')))throw new QRScanError('scanImageType');
  if(file.size>18*1024*1024)throw new QRScanError('scanImageSize');
  const image=await openImage(file);
- try{
+ const deadline=Date.now()+17000; // never spin indefinitely on a mobile device
+ const worker=makeWorker();
+ try {
   let native=null;
-  if(typeof globalThis.BarcodeDetector==='function'){try{native=new BarcodeDetector({formats:['qr_code']});}catch{}}
-  // Start loading jsQR in parallel. Native detection need not wait for a CDN.
-  const fastPromise=ensureJsQR();
+  if(typeof globalThis.BarcodeDetector==='function'){
+   try{native=new globalThis.BarcodeDetector({formats:['qr_code']});}catch{}
+  }
+  // Order is important: prioritize the lower part of a full receipt photo.
   const viewports=[
    [0,0,1,1,1350,0],
-   [0,.38,1,.62,1700,0], // receipt QR codes are usually near the bottom
+   [0,.38,1,.62,1700,0],
    [0,.35,.62,.65,1600,0],
    [.38,.35,.62,.65,1600,0],
+   [0,.52,1,.48,1850,0],
    [0,0,1,1,1550,90],
    [0,0,1,1,1550,270]
   ];
-  if(native){for(const [x,y,w,h,max,rotation] of viewports.slice(0,2)){
-   const codes=await scanNative(makeCanvas(image,[x,y,w,h],max,rotation),native);
-   if(codes.length)return [...new Set(codes)];
-  }}
-  const fast=await fastPromise;
-  if(fast){
-   for(const [x,y,w,h,max,rotation] of viewports){
+  if(native){
+   for(const [x,y,w,h,max,rotation] of viewports.slice(0,3)){
     const canvas=makeCanvas(image,[x,y,w,h],max,rotation);
-    const codes=scanJsQR(canvas,fast).filter(Boolean);
+    const codes=await scanNative(canvas,native);canvas.width=canvas.height=0;
     if(codes.length)return [...new Set(codes)];
-    await delayFrame(); // keep the phone UI responsive between image scans
    }
   }
-  // ZXing fallback is bounded, not retried eight times on huge screenshots.
-  const zxing=await ensureZXing();
-  if(zxing){for(const [x,y,w,h,max] of viewports.slice(0,3)){
-   const codes=await scanZXing(makeCanvas(image,[x,y,w,h],max),zxing);
+  let workerAvailable=!!worker;
+  if(worker){
+   for(const [x,y,w,h,max,rotation] of viewports){
+    if(Date.now()>deadline)throw new QRScanError('scanNotFound');
+    const canvas=makeCanvas(image,[x,y,w,h],max,rotation);
+    const codes=await scanWorker(worker,canvas);canvas.width=canvas.height=0;
+    if(codes===null){workerAvailable=false;break;}
+    if(codes.length)return [...new Set(codes)];
+    await delayFrame();
+   }
+  }
+  if(workerAvailable)throw new QRScanError('scanNotFound');
+  // Browser/Live Server fallback. GitHub Pages normally uses the bundled worker.
+  const decoder=await ensureJsQR();
+  if(!decoder){
+   if(native)throw new QRScanError('scanNotFound');
+   throw new QRScanError('scanUnsupported');
+  }
+  for(const [x,y,w,h,max,rotation] of viewports){
+   if(Date.now()>deadline)throw new QRScanError('scanNotFound');
+   const canvas=makeCanvas(image,[x,y,w,h],max,rotation);
+   const codes=scanJsQR(canvas,decoder);canvas.width=canvas.height=0;
    if(codes.length)return [...new Set(codes)];
    await delayFrame();
-  }}
-  if(!fast&&!native&&!zxing)throw new QRScanError('scanUnsupported');
+  }
   throw new QRScanError('scanNotFound');
- }finally{image.close();}
+ }finally{worker?.terminate();image.close();}
 }

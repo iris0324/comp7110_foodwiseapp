@@ -85,10 +85,15 @@ test('Both camera inputs support genuine native capture and independent album se
  setLanguage('en');
  const r=foodScreen({s:seed(),r:{page:'receipt-camera'},e:{},filters:{}});
  const p=ghostScreen({s:seed(),r:{page:'product-camera',id:'cart-1'},e:{rows:[]}});
- assert.match(r,/id="receipt-camera"[^>]*capture="environment"/);
- assert.match(r,/id="receipt-image"[^>]*type="file"/);
- assert.match(p,/id="product-camera"[^>]*capture="environment"/);
- assert.match(p,/id="product-image"[^>]*type="file"/);
+ const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ assert.match(r,/for="receipt-camera"/);
+ assert.match(r,/for="receipt-image"/);
+ assert.match(p,/for="product-camera"/);
+ assert.match(p,/for="product-image"/);
+ assert.match(html,/id="receipt-camera"[^>]*capture="environment"/);
+ assert.match(html,/id="receipt-image"[^>]*type="file"/);
+ assert.match(html,/id="product-camera"[^>]*capture="environment"/);
+ assert.match(html,/id="product-image"[^>]*type="file"/);
  assert.match(css,/\.camera-bar\.native-capture \.native-shutter/);
 });
 test('Only Add Food modal primary button receives the new single-outline style',()=>{
