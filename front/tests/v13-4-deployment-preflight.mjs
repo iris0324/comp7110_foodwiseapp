@@ -36,7 +36,7 @@ for(const dir of ['js']){
 }
 if(!html.includes("location.hostname.toLowerCase() === 'iris0324.github.io'"))fail('GitHub Pages root fix missing');
 if(!html.includes('window.__foodwiseShowStartupFailure'))fail('No user-visible startup error fallback');
-if(!html.includes('js/main.js?v=13.4'))fail('Expected v13.4 entry script');
+if(!html.includes('js/main.js?v=13.5'))fail('Expected v13.5 entry script');
 if(!fs.readFileSync(path.join(root,'js/main.js'),'utf8').includes('window.__foodwiseReady=true;checkPhoneReminders()'))fail('App does not report successful startup');
 if(process.argv.includes('--require-vendor')){
  const vendor=path.join(root,'js/vendor/jsQR.js');

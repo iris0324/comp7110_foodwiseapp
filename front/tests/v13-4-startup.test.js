@@ -32,7 +32,7 @@ test('Deployment actually bundles jsQR, preflights files and probes public asset
 });
 test('Photo capture code and QR-to-catalog workflow are preserved',()=>{
  assert.match(main,/async function chooseImage\(file\)/);
- assert.match(main,/const codes=await decodeQRPhoto\(file\)/);
+ assert.match(main,/const codes=await decodeQRPhoto\(ref\.blob\)/);
  assert.match(main,/codes\.map\(code=>catalog\.receipt\(code\)\)/);
  assert.match(main,/async function chooseProductImage\(file\)/);
 });

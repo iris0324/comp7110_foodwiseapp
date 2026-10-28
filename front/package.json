@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/v9-contract.test.js tests/v9-ui-render.test.js tests/v9-matrix.test.js tests/v10-regression.test.js tests/v11-regression.test.js tests/v11-1-onboarding.test.js tests/v12-screenshot-qa.test.js tests/v13-entry-savings.test.js tests/v13-1-photo-fix.test.js tests/v13-2-qr-receipt.test.js tests/v13-3-receipt-capture.test.js tests/v13-4-startup.test.js",
+    "test": "node --test tests/v9-contract.test.js tests/v9-ui-render.test.js tests/v9-matrix.test.js tests/v10-regression.test.js tests/v11-regression.test.js tests/v11-1-onboarding.test.js tests/v12-screenshot-qa.test.js tests/v13-entry-savings.test.js tests/v13-1-photo-fix.test.js tests/v13-2-qr-receipt.test.js tests/v13-3-receipt-capture.test.js tests/v13-4-startup.test.js tests/v13-5-approved-photo-flows.test.js",
     "test:v8-archive": "node --test tests/integration.test.js tests/v8-flow.test.js tests/v8-regression.test.js",
     "test:legacy": "node --test tests/domain.test.js",
     "preview": "node tests/preview.mjs"

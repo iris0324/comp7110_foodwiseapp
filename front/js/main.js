@@ -1,21 +1,21 @@
 import {Repository} from './storage/repository.js?v=13.0';
 import {Store} from './app/store.js?v=13.0';
-import {route,path} from './app/router.js?v=13.0';
+import {route,path} from './app/router.js?v=13.5';
 import {entryPage,initialPage,ONBOARDING_KEY} from './app/onboarding.js?v=13.0';
 import {clone,uid,money,cents,half,qty,sub,cmp,daysUntil,today,reductionQty} from './core/values.js?v=13.0';
-import {cartFields,foodFields} from './domain/commands.js?v=13.0';
+import {cartFields,foodFields} from './domain/commands.js?v=13.5';
 import {getStory,getOutcome} from './domain/selectors.js?v=13.0';
 import {receiptServices} from './domain/receipt.js?v=13.3';
 import {t,setLanguage,getLanguage} from './i18n/index.js?v=13.0';
 import {esc,$} from './ui/dom.js?v=13.0';
 import {icon,title,btn,nav,notice,sprite,resultKey,reductionSummary} from './ui/components.js?v=13.0';
-import {foodScreen} from './ui/screens/food.js?v=13.2';
-import {ghostScreen,sameNameCard,reductionPreview,cartPricePreview} from './ui/screens/ghost-v8.js?v=13.1';
+import {foodScreen} from './ui/screens/food.js?v=13.5';
+import {ghostScreen,sameNameCard,reductionPreview,cartPricePreview} from './ui/screens/ghost-v8.js?v=13.5';
 import {storyScreen,actionPreview,useAmountPreview,buyLessPreview} from './ui/screens/story.js?v=13.0';
 import {authScreen} from './ui/screens/auth.js?v=13.0';
 import {bindFeed} from './interaction/feed.js?v=13.0';
 import {Animator} from './interaction/animator.js?v=13.0';
-import {CatalogService} from './services/catalog-service.js?v=13.0';
+import {CatalogService} from './services/catalog-service.js?v=13.5';
 import {decodeQRPhoto} from './scanners/qr-scanner.js?v=13.3';
 const store=new Store(new Repository());
 const catalog=new CatalogService();
@@ -25,7 +25,7 @@ let guestEnteredThisLaunch=false;
 let current=route(),editor=null,editorBaseline='',modal=null,modalFocus=null,cleanupFeed=()=>{},playing=null,phase='result',message='',generating=false,external=false,previewToken=0;
 const filters={search:'',category:'',status:'available'};
 const blankFood=()=>({name:'',quantity:'1',unit:'',category:'other',recordedDate:'',location:'',planDate:''});
-const blankCart=()=>({cartItemId:uid(),name:'',quantity:'1',price:'',note:'',asset:'bag',priceMeaning:'total'});
+const blankCart=()=>({cartItemId:uid(),name:'',quantity:'1',unit:'',price:'',note:'',asset:'bag',priceMeaning:'total'});
 const keyOf=r=>r.page+'/'+r.id;
 function editorData(e){if(!e)return null;if(e.type==='receipt')return {id:e.id,rows:e.rows,imageId:e.imageId,sample:e.sample,qrPayload:e.qrPayload};if(e.type==='cart')return e.rows;return e.fields;}
 function scheduleCartSave(){if(!editor||editor.type!=='cart'||current.page!=='cart'||store.pending)return;clearTimeout(cartSaveTimer);cartSaveTimer=setTimeout(()=>{cartSaveTimer=null;if(editor?.type==='cart'&&dirty()&&!store.pending)saveDraft();},700);}
@@ -61,7 +61,7 @@ function prepareEditor(r){
  }
  if(['receipt','receipt-camera'].includes(r.page)){
   const saved=s.receiptImports.find(x=>x.id===r.id&&x.status==='draft')||(!r.id?s.receiptImports.find(x=>x.status==='draft'):null);
-  releaseEditor();editor={type:'receipt',id:saved?.id||uid(),rows:clone(saved?.rawRows||[]),imageId:saved?.imageId||null,sample:saved?!!saved.sample:false,qrPayload:saved?.qrPayload||null,receiptId:saved?.receiptId||null,storeName:saved?.storeName||null,receiptTotal:saved?.receiptTotal||null,imageUrl:null,blob:null,photoStatus:saved?.imageId?'ready':'',photoIssue:''};markBaseline();
+  releaseEditor();editor={type:'receipt',id:saved?.id||uid(),rows:clone(saved?.rawRows||[]),imageId:saved?.imageId||null,sample:saved?!!saved.sample:false,qrPayload:saved?.qrPayload||null,receiptId:saved?.receiptId||null,storeName:saved?.storeName||null,receiptTotal:saved?.receiptTotal||null,imageUrl:null,blob:null,photoStatus:saved?.imageId?'ready':'',photoIssue:'',reviewStep:saved?.rawRows?.length?'review':'photo'};markBaseline();
   if(saved?.imageId){const ref=editor;store.repository.getMedia(saved.imageId).then(blob=>{if(editor===ref&&blob){editor.imageUrl=URL.createObjectURL(blob);render();}}).catch(()=>{if(editor===ref){message='previewError';render();}});}
   return;
  }
@@ -123,13 +123,13 @@ function invalidBinding(error){
  return suffix?'fields.'+suffix:null;
 }
 function render(){
- if(!store.state)return;cleanupFeed();setLanguage(store.state.settings.language);document.documentElement.lang=getLanguage()==='zh'?'zh-CN':'en';document.title='FoodWise · '+t(current.page==='home'?'home':current.page.startsWith('food')||current.page==='receipt'||current.page==='receipt-camera'?'food':'ghost');
+ if(!store.state)return;cleanupFeed();setLanguage(store.state.settings.language);document.documentElement.lang=getLanguage()==='zh'?'zh-CN':'en';document.title='FoodWise · '+t(current.page==='home'?'home':current.page.startsWith('food')||['receipt','receipt-camera','receipt-success'].includes(current.page)?'food':'ghost');
  document.body.classList.toggle('reduce-motion',!!store.state.settings.reduceMotion||window.matchMedia('(prefers-reduced-motion: reduce)').matches);document.body.classList.toggle('no-story-animations',store.state.settings.storyAnimations===false);document.body.classList.toggle('hide-story-guidance',store.state.settings.storyGuidance===false);
  const focus=document.activeElement?.dataset?.bind,selection=document.activeElement?.selectionStart,scroll=window.scrollY;
- let body;try{body=['welcome','create-account','login','verify-email','forgot-password','guest-info','terms','privacy'].includes(current.page)?authScreen(current.page):current.page==='home'?home():['settings','food-settings','ghost-settings','food-help','about'].includes(current.page)?settings():current.page.startsWith('food')||current.page==='receipt'||current.page==='receipt-camera'?foodScreen(context()):['story','custom'].includes(current.page)?storyScreen(context()):ghostScreen(context());}catch(error){console.error(error);body=notice('stateError')+nav('home','home');}
+ let body;try{body=['welcome','create-account','login','verify-email','forgot-password','guest-info','terms','privacy'].includes(current.page)?authScreen(current.page):current.page==='home'?home():['settings','food-settings','ghost-settings','food-help','about'].includes(current.page)?settings():current.page.startsWith('food')||['receipt','receipt-camera','receipt-success'].includes(current.page)?foodScreen(context()):['story','custom'].includes(current.page)?storyScreen(context()):ghostScreen(context());}catch(error){console.error(error);body=notice('stateError')+nav('home','home');}
  const companion='';
  const onAuth=['welcome','create-account','login','verify-email','forgot-password','guest-info','terms','privacy'].includes(current.page);
- const group=current.page.startsWith('food')||current.page==='receipt'||current.page==='receipt-camera'?'food':current.page==='home'?'home':'cart';
+ const group=current.page.startsWith('food')||['receipt','receipt-camera','receipt-success'].includes(current.page)?'food':current.page==='home'?'home':'cart';
  const err=store.error||message;const feedback=err?`<div id="error" class="notice ${err==='reductionSaved'?'green':'error'}" role="${err==='reductionSaved'?'status':'alert'}" tabindex="-1">${err==='authNotConnected'?(getLanguage()==='zh'?'此預覽版尚未開放註冊與登入，你可以先以訪客身份使用。':'Account sign-up and log-in are not available in this preview. You can continue as a guest.'):err==='productRecognitionUnavailable'?(getLanguage()==='zh'?'無法辨識這張商品照片。請重拍，或改為手動新增。':'Could not recognise this product photo. Try another photo or enter it manually.')+' '+`<button class=\"button outline\" data-action=\"photo-manual\">${getLanguage()==='zh'?'手動新增':'Enter Manually'}</button>`:t(err)}${store.pending?btn('retry','retry','','outline'):''}${['conflict','epochError'].includes(err)?btn('reloadSaved','reload','','outline'):''}</div>`:'';
  $('#app').innerHTML=`<div class="app-shell ${onAuth?'auth-shell':''}">${onAuth?`<div class="auth-language"><button class="lang-button" data-action="language">${getLanguage()==='en'?'中文':'EN'}</button></div>`:''}${onAuth?'':`<header class="app-head">${current.page==='home'?`<div class="wordmark"><img src="assets/ghosty/happy.png" alt="" class="logo-ghost"><span>Food<span class="wise-accent">Wise</span><i class="logo-sprout">❧</i></span></div>`:`<button class="icon-button" data-action="back" aria-label="${t('back')}">${icon('back')}</button><span class="wordmark small"><img src="assets/ghosty/happy.png" alt="" class="logo-ghost"><span>Food<span class="wise-accent">Wise</span></span></span>`}${companion}<div class="row"><button id="language-button" class="lang-button" data-action="language">${getLanguage()==='en'?'中文':'EN'}</button>${current.page==='home'?'':`<button class="icon-button" data-go="${group==='food'?'food-settings':'ghost-settings'}" aria-label="${t('settings')}">${icon('settings')}</button>`}</div></header>`}<main id="main" tabindex="-1">${feedback}${external?notice('conflict')+btn('reloadSaved','reload','','outline'):''}${body||notice('missing')}</main><div class="save-indicator" role="status">${store.status==='saving'?t('saving'):store.pending?t('save_failed'):dirty()&&editor?.type!=='cart'?t('idle'):''}</div>${onAuth?'':`<nav class="bottom-nav" aria-label="${t('home')}">${[['home','home'],['food','food'],['ghost-home','bag']].map(([page,ico])=>`<button class="${group===(page==='ghost-home'?'cart':page)?'active':''}" data-go="${page}"${group===(page==='ghost-home'?'cart':page)?' aria-current="page"':''}>${icon(ico)}<span>${t(page==='ghost-home'?'ghost':page)}</span></button>`).join('')}</nav>`}${modalBody()}</div>`;
  if(['settings','food-settings','ghost-settings'].includes(current.page)){const bs=[...document.querySelectorAll('[data-action="language"][data-value]')];bs.forEach(b=>b.textContent=b.dataset.value==='en'?'English':'中文');}
@@ -146,7 +146,7 @@ function setBound(path,value){if(!editor)return;const keys=path.split('.');let o
 function saveDraft(done=()=>{}){
  if(!editor)return;
  const e=editor;
- const success=()=>{if(editor===e){markBaseline();e.blob=null;e.productBlob=null;}done();};
+ const success=()=>{if(editor===e){markBaseline();if(e.type!=='receipt')e.blob=null;e.productBlob=null;}done();};
  if(e.type==='cart'){
   const photoMedia=e.productBlob&&e.productImageId?[{id:e.productImageId,blob:e.productBlob}]:[];
   return store.commit('cart_save',{rows:e.rows},photoMedia,success);
@@ -204,39 +204,33 @@ function photoMessage(error){return ['scanNotFound','scanWrongCode'].includes(er
 async function chooseImage(file){
  if(!file)return;
  const ref=editor,token=++previewToken;
- let url;
  try{
-  // Preview FIRST. A receipt without a known QR must never make a successful photo disappear.
-  url=await receiptServices.decode(file);
+  const url=await receiptServices.decode(file);
   if(!photoStillCurrent(ref,token)){URL.revokeObjectURL(url);return;}
   if(ref.imageUrl)URL.revokeObjectURL(ref.imageUrl);
-  Object.assign(ref,{imageUrl:url,imageId:uid(),blob:file,photoStatus:'scanning',photoIssue:'',rows:[],
-   sample:false,qrPayload:null,receiptId:null,storeName:null,receiptTotal:null});
+  Object.assign(ref,{imageUrl:url,imageId:uid(),blob:file,photoStatus:'ready',photoIssue:'',reviewStep:'photo',rows:[],sample:false,qrPayload:null,receiptId:null,storeName:null,receiptTotal:null});
   stopCamera();current={page:'receipt',id:ref.id};history.pushState(null,'',path('receipt',ref.id));
   message='';render();window.scrollTo(0,0);
- }catch(error){
-  if(!photoStillCurrent(ref,token))return;
-  message=error.message||'previewError';render();return;
- }
+ }catch(error){if(photoStillCurrent(ref,token)){message=error.message||'previewError';render();}}
+}
+async function scanConfirmedReceipt(){
+ const ref=editor;if(!ref||ref.type!=='receipt'||!ref.blob||ref.photoStatus==='scanning')return;
+ const token=++previewToken;
+ ref.photoStatus='scanning';ref.photoIssue='';render();
  try{
-  const codes=await decodeQRPhoto(file);
+  const codes=await decodeQRPhoto(ref.blob);
   if(!photoStillCurrent(ref,token))return;
   const match=codes.map(code=>catalog.receipt(code)).find(Boolean);
-  if(!match){ref.photoIssue='no_match';ref.photoStatus='ready';}
-  else if(store.state.receiptImports.some(x=>x.status==='confirmed'&&x.qrPayload===match.qr_payload)){
-   ref.photoIssue='duplicate';ref.photoStatus='ready';ref.qrPayload=null;
-  }else{
-   Object.assign(ref,{qrPayload:match.qr_payload,receiptId:match.receipt_id,storeName:match.store,
-    receiptTotal:match.total,rows:catalog.receiptRows(match,uid),photoStatus:'ready',photoIssue:''});
+  if(!match){ref.photoIssue='no_match';}
+  else if(store.state.receiptImports.some(x=>x.status==='confirmed'&&x.qrPayload===match.qr_payload))ref.photoIssue='duplicate';
+  else{
+   Object.assign(ref,{qrPayload:match.qr_payload,receiptId:match.receipt_id,storeName:match.store,receiptTotal:match.total,rows:catalog.receiptRows(match,uid),reviewStep:'review'});
   }
- }catch(error){
-  if(!photoStillCurrent(ref,token))return;
-  ref.photoStatus='ready';ref.photoIssue=photoMessage(error);
- }finally{
+ }catch(error){if(photoStillCurrent(ref,token))ref.photoIssue=photoMessage(error);}
+ finally{
   if(photoStillCurrent(ref,token)){
-   render();
-   // Save this receipt photo locally without adding anything to My Food.
-   // The user must still confirm every item before importing.
+   ref.photoStatus='ready';render();window.scrollTo(0,0);
+   // Retain the photo as a local draft; food is only added on final confirmation.
    if(ref.blob&&!store.pending)await saveDraft();
   }
  }
@@ -244,29 +238,29 @@ async function chooseImage(file){
 async function chooseProductImage(file){
  if(!file)return;
  const ref=editor,token=++previewToken;
- let url;
  try{
-  url=await receiptServices.decode(file);
+  const url=await receiptServices.decode(file);
   if(!photoStillCurrent(ref,token)){URL.revokeObjectURL(url);return;}
   const row=ref.rows.find(x=>x.cartItemId===current.id);if(!row){URL.revokeObjectURL(url);return;}
   if(ref.productPhotoUrl)URL.revokeObjectURL(ref.productPhotoUrl);
   ref.productPhotoUrl=url;ref.productBlob=file;ref.productImageId=uid();row.photoId=ref.productImageId;
-  ref.photoStatus='scanning';ref.photoIssue='';ref.scannedProduct=null;
+  ref.productStep='photo';ref.photoStatus='ready';ref.photoIssue='';ref.scannedProduct=null;
   stopCamera();current={page:'product-review',id:row.cartItemId};history.pushState(null,'',path(current.page,current.id));
   message='';render();window.scrollTo(0,0);
- }catch(error){
-  if(!photoStillCurrent(ref,token))return;
-  message=error.message||'previewError';render();return;
- }
+ }catch(error){if(photoStillCurrent(ref,token)){message=error.message||'previewError';render();}}
+}
+async function scanConfirmedProduct(){
+ const ref=editor;if(!ref||ref.type!=='cart'||!ref.productBlob||ref.photoStatus==='scanning')return;
+ const token=++previewToken;ref.photoStatus='scanning';ref.photoIssue='';ref.productStep='details';render();
  try{
-  const codes=await decodeQRPhoto(file);
+  const codes=await decodeQRPhoto(ref.productBlob);
   if(!photoStillCurrent(ref,token))return;
   const match=codes.map(code=>catalog.product(code)).find(Boolean);
   const row=ref.rows.find(x=>x.cartItemId===current.id);if(!row)return;
-  if(match){const photoId=row.photoId;Object.assign(row,catalog.cartRow(match,()=>row.cartItemId),{photoId});ref.scannedProduct=match;ref.photoIssue='';}
+  if(match){const photoId=row.photoId;Object.assign(row,catalog.cartRow(match,()=>row.cartItemId),{photoId});ref.scannedProduct=match;}
   else ref.photoIssue='no_match';
  }catch(error){if(photoStillCurrent(ref,token))ref.photoIssue=photoMessage(error);}
- finally{if(photoStillCurrent(ref,token)){ref.photoStatus='ready';render();}}
+ finally{if(photoStillCurrent(ref,token)){ref.photoStatus='ready';render();window.scrollTo(0,0);}}
 }
 function applyCatalogProduct(id){
  const product=catalog.getProduct(id);if(!product)return;
@@ -275,7 +269,7 @@ function applyCatalogProduct(id){
  if(row){Object.assign(row,catalog.cartRow(product,()=>row.cartItemId));editor.scannedProduct=product;render();}
 }
 
-function goBack(){const id=current.id;if(current.page==='custom')navigate('story',id);else if(current.page==='story'){const st=getStory(store.state,id);if(st?.status==='in_progress'&&!['source','custom_edit'].includes(st.currentStep)){action('story-back');return;}navigate('ghost-home');}else if(['detail','outcome'].includes(current.page))navigate(current.page==='outcome'?'detail':'history',current.page==='outcome'?id:'');else if(current.page==='purchase'||current.page==='money'||current.page==='savings-result')navigate('ghost-home');else if(current.page==='choose-item')navigate('ghost-home');else if(current.page==='ghost-settings')navigate('ghost-home');else if(current.page==='food-settings'||current.page==='food-help')navigate('food');else if(current.page==='about')navigate('food-settings');else if(['ghost-add','product-review','product-camera','checkout'].includes(current.page))navigate('cart');else if(current.page==='cart'||current.page==='history')navigate('ghost-home');else if(['food-edit','food-use','food-plan'].includes(current.page))navigate('food-detail',id);else if(current.page==='food-detail'||current.page==='food-new'||current.page==='receipt'||current.page==='receipt-camera')navigate('food');else navigate('home');}
+function goBack(){const id=current.id;if(current.page==='receipt'&&editor?.reviewStep==='confirm'){editor.reviewStep='review';render();return;}if(current.page==='receipt'&&editor?.reviewStep==='review'){editor.reviewStep='photo';render();return;}if(current.page==='product-review'&&editor?.productStep==='confirm'){editor.productStep='details';render();return;}if(current.page==='product-review'&&editor?.productStep==='details'){editor.productStep='photo';render();return;}if(current.page==='custom')navigate('story',id);else if(current.page==='story'){const st=getStory(store.state,id);if(st?.status==='in_progress'&&!['source','custom_edit'].includes(st.currentStep)){action('story-back');return;}navigate('ghost-home');}else if(['detail','outcome'].includes(current.page))navigate(current.page==='outcome'?'detail':'history',current.page==='outcome'?id:'');else if(current.page==='purchase'||current.page==='money'||current.page==='savings-result')navigate('ghost-home');else if(current.page==='choose-item')navigate('ghost-home');else if(current.page==='ghost-settings')navigate('ghost-home');else if(current.page==='food-settings'||current.page==='food-help')navigate('food');else if(current.page==='about')navigate('food-settings');else if(['ghost-add','product-review','product-camera','checkout'].includes(current.page))navigate('cart');else if(current.page==='cart'||current.page==='history')navigate('ghost-home');else if(['food-edit','food-use','food-plan'].includes(current.page))navigate('food-detail',id);else if(['food-detail','food-new','receipt','receipt-camera','receipt-success'].includes(current.page))navigate('food');else navigate('home');}
 async function action(name,value){
  if(name==='retry'){await store.retry();return;}
  if(name==='reload'){await store.reload();external=false;render();return;}
@@ -302,10 +296,21 @@ async function action(name,value){
  if(name==='cart-remove'){editor.rows=editor.rows.filter(x=>x.cartItemId!==value);scheduleCartSave();render();return;}
  if(name==='ignore-reference'){editor.ignoreReference=true;render();return;}
  if(name==='open-product-scan'){navigateNow('product-camera',uid());return;}
+ if(name==='product-photo-confirm'){await scanConfirmedProduct();return;}
+ if(name==='product-review-back-photo'){editor.productStep='photo';render();return;}
+ if(name==='product-edit-items'){editor.productStep='details';render();return;}
+ if(name==='product-confirm-add'){if(editor?.productStep!=='confirm')return;try{cartFields(editor.rows.find(x=>x.cartItemId===current.id));saveDraft(()=>{try{localStorage.removeItem('fw-pending-item');}catch{}navigateNow('cart');});}catch(error){store.error=error.message;editor.productStep='details';render();}return;}
  if(name==='catalog-select'){applyCatalogProduct(value);return;}
- if(name==='receipt-add'){editor.rows.push({id:uid(),...blankFood()});render();return;}
+ if(name==='receipt-photo-confirm'){await scanConfirmedReceipt();return;}
+ if(name==='receipt-review-back'){editor.reviewStep='photo';render();return;}
+ if(name==='receipt-review-next'){try{if(!editor.rows.length)throw Error('emptyReceipt');editor.rows.forEach(foodFields);editor.reviewStep='confirm';message='';render();window.scrollTo(0,0);}catch(error){store.error=error.message;render();}return;}
+ if(name==='receipt-edit-items'){editor.reviewStep='review';render();return;}
+ if(name==='receipt-another'){navigateNow('receipt-camera',uid());return;}
+ if(name==='receipt-edit-row'){const row=editor.rows[Number(value)];if(!row)return;editor.expandedRow=editor.expandedRow===row.id?null:row.id;render();return;}
+ if(name==='receipt-qty-up'||name==='receipt-qty-down'){const row=editor.rows[Number(value)];if(!row)return;const old=Number(row.quantity),delta=name==='receipt-qty-up'?1:-1;if(!Number.isFinite(old)||old<=0)return;row.quantity=String(Math.max(1,Math.round((old+delta)*1000)/1000));render();return;}
+ if(name==='receipt-add'){const newRow={id:uid(),...blankFood()};editor.rows.push(newRow);editor.expandedRow=newRow.id;render();return;}
  if(name==='receipt-remove'){editor.rows.splice(Number(value),1);render();return;}
- if(name==='receipt-confirm'){store.commit('receipt_confirm',{id:editor.id,rows:editor.rows,imageId:editor.imageId,sample:editor.sample,qrPayload:editor.qrPayload,receiptId:editor.receiptId,storeName:editor.storeName,receiptTotal:editor.receiptTotal},editor.blob?[{id:editor.imageId,blob:editor.blob}]:[],()=>navigateNow('food'));return;}
+ if(name==='receipt-confirm'){if(editor.reviewStep!=='confirm')return;const id=editor.id;store.commit('receipt_confirm',{id,rows:editor.rows,imageId:editor.imageId,sample:editor.sample,qrPayload:editor.qrPayload,receiptId:editor.receiptId,storeName:editor.storeName,receiptTotal:editor.receiptTotal},editor.blob?[{id:editor.imageId,blob:editor.blob}]:[],()=>navigateNow('receipt-success',id));return;}
  
  if(name==='capture-receipt'||name==='capture-product'){await captureFrame(name==='capture-receipt'?'receipt':'product');return;}
  if(name==='camera-retry'){stopCamera();cameraUnavailable=false;startCamera();return;}
@@ -345,6 +350,7 @@ async function submit(kind){
  if(kind==='food'){foodFields(editor.fields);if(current.page!=='food-new'&&qty(editor.fields.remaining)==='0'){openModal({type:'zero',fields:clone(editor.fields)});return;}store.commit(current.page==='food-new'?'food_add':'food_edit',{id:current.id,fields:editor.fields},[],result=>navigateNow('food-detail',result.id||current.id));}
  if(kind==='food-use'){const n=qty(editor.fields.remaining);if(n==='0')openModal({type:'zero'});else store.commit('food_remaining',{id:current.id,remaining:n},[],()=>navigateNow('food-detail',current.id));}
  if(kind==='food-plan')store.commit('food_plan',{id:current.id,planDate:editor.fields.planDate},[],()=>navigateNow('food-detail',current.id));
+ if(kind==='product-review-next'){cartFields(editor.rows.find(x=>x.cartItemId===current.id));if(editor.photoStatus==='scanning')return;editor.productStep='confirm';message='';render();window.scrollTo(0,0);}
  if(kind==='ghost-add'){cartFields(editor.rows.find(x=>x.cartItemId===current.id));saveDraft(()=>{try{localStorage.removeItem('fw-pending-item');}catch{}navigateNow('cart');});}
  if(kind==='custom'){store.commit('story_start',{itemId:current.id,source:'custom',template:editor.fields.template,text:editor.fields.text},[],()=>navigateNow('story',current.id));}
  if(kind==='story-use'){
@@ -400,7 +406,7 @@ document.addEventListener('input',event=>{const el=event.target;if(el.dataset.bi
   if(row&&target)target.innerHTML=cartPricePreview(row);
  }
  if(el.dataset.filter){filters[el.dataset.filter]=el.value;const active=el.selectionStart;render();const input=$('[data-filter="search"]');input?.focus({preventScroll:true});try{input?.setSelectionRange(active,active);}catch{}}});
-document.addEventListener('change',event=>{if(['receipt-image','receipt-camera'].includes(event.target.id)){const file=event.target.files?.[0];event.target.value='';if(file)chooseImage(file);}if(['product-image','product-camera'].includes(event.target.id)){const file=event.target.files?.[0];event.target.value='';if(file)chooseProductImage(file);}if(event.target.dataset.bind){setBound(event.target.dataset.bind,event.target.value);if(event.target.tagName==='SELECT')render();}});
+document.addEventListener('change',event=>{if(['receipt-image','receipt-camera'].includes(event.target.id)){const file=event.target.files?.[0];event.target.value='';if(file)chooseImage(file);}if(['product-image','product-camera'].includes(event.target.id)){const file=event.target.files?.[0];event.target.value='';if(file)chooseProductImage(file);}if(event.target.dataset.bind){setBound(event.target.dataset.bind,event.target.value);if(event.target.tagName==='SELECT'&&current.page!=='receipt')render();}});
 let handoverDrag=null;
 document.addEventListener('pointerdown',event=>{
  const food=event.target.closest('[data-handover-food]');if(!food||food.disabled||store.pending)return;

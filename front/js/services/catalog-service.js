@@ -33,7 +33,7 @@ export class CatalogService {
   }
   cartRow(product,idMaker){
     return {cartItemId:idMaker(),productId:product.id,name:`${product.brand} · ${product.name}`,
-      quantity:String(product.quantity),price:(Number(product.price)/Math.max(1,Number(product.quantity))).toFixed(2),priceMeaning:'unit',
+      quantity:String(product.quantity),unit:product.unit||'',price:(Number(product.price)/Math.max(1,Number(product.quantity))).toFixed(2),priceMeaning:'unit',
       note:`${product.size} · ${product.promotion||''}`.trim(),
       asset:/milk/i.test(product.name)?'milk':/chocolate/i.test(product.name)?'chocolate':'bag'};
   }
