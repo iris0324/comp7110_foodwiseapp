@@ -3,10 +3,12 @@ name: Deploy FoodWise to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'front/**'
       - '.github/workflows/deploy-pages.yml'
+
   workflow_dispatch:
 
 permissions:
@@ -20,7 +22,9 @@ concurrency:
 
 jobs:
   deploy:
+    name: Deploy FoodWise
     runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -31,9 +35,13 @@ jobs:
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Check frontend entry
-        run: test -f front/index.html
+        run: |
+          test -f front/index.html
+          echo "FoodWise frontend found."
 
       - name: Upload FoodWise frontend
         uses: actions/upload-pages-artifact@v4
@@ -43,4 +51,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-  
