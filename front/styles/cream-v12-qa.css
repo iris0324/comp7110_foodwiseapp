@@ -1,0 +1,113 @@
+/* FoodWise v12 — screenshot QA fixes, preserves the approved 6-colour palette. */
+:root{--fw-cream:#FFF9F6;--fw-strawberry:#F5DCE5;--fw-peach:#F8E2D8;--fw-sakura:#F4E7ED;--fw-rose:#DDA5B6;--fw-text:#75646D}
+html,body{background:var(--fw-cream)!important;color:var(--fw-text)!important}
+#main{padding-bottom:145px!important;overflow-wrap:break-word;min-width:0}
+#main>*{max-width:100%;min-width:0}
+.app-shell{max-width:430px;width:100%;min-width:0}
+.button,.story-answer,.field input,.field select,.field textarea{max-width:100%;min-width:0}
+/* FE-104 / 402px screenshot — the records button MUST fit its own outline. */
+.chips{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px!important;overflow:visible!important;padding:5px 0 8px!important}
+.chips .chip{width:100%;min-width:0;min-height:45px;white-space:normal;overflow-wrap:normal;line-height:1.25;padding:9px 7px;text-align:center;font-size:11px}
+#main>button[data-action="food-status"]{width:100%!important;min-height:48px!important;padding:10px 12px!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:center;font-size:12px!important;border-radius:15px!important;line-height:1.3}
+/* FE-105 — no compressed login CTA, consent & notice boundaries. */
+.auth-shell{width:100%;max-width:475px}
+.auth-shell #main{padding:23px clamp(12px,5vw,22px) 90px!important}
+.auth-page{padding:22px 16px!important;width:100%;max-width:100%}
+.auth-page .auth-form{gap:13px}
+.auth-subnav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:5px 7px;margin:17px 0 10px;line-height:1.5;font-size:12px}
+.auth-subnav .button.text{display:inline-flex;width:auto!important;min-height:35px;padding:5px 9px!important;margin:0!important;white-space:normal;text-align:center;color:var(--fw-text)!important;background:var(--fw-strawberry)!important;border-radius:11px}
+.auth-subnav .auth-subnav-label{font-size:12px;color:var(--fw-text)}
+.auth-service-info{line-height:1.6;padding:0 5px;margin:14px 0 13px;color:var(--fw-text)}
+.auth-page>.button{width:100%!important}
+.auth-consent{align-items:flex-start;gap:9px;line-height:1.7}
+.auth-consent>span{flex:1;min-width:0;overflow-wrap:break-word}
+.text-inline{color:#946775!important}
+/* FE-107 — unify select alignment, padded caret, approved focus ring. */
+.field select{appearance:none!important;-webkit-appearance:none!important;min-height:50px!important;line-height:1.4!important;padding:12px 43px 12px 15px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m5 7 5 5 5-5' stroke='%2375646D' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;background-position:right 13px center!important;background-repeat:no-repeat!important;background-size:17px 17px!important}
+.field select:focus,.field select:focus-visible,.field input:focus,.field input:focus-visible,.field textarea:focus-visible{outline:2px solid var(--fw-rose)!important;outline-offset:2px!important;box-shadow:0 0 0 3px #F5DCE588!important;border-color:var(--fw-rose)!important}
+/* FE-106 — direct per-food deletion only, no bulk clear UI. */
+.food-delete-action{margin-top:28px;padding-top:14px;border-top:1px solid #E7D3DF}
+.food-delete-action .button.danger{background:#FFFFFF!important;color:#A14D64!important;border-color:#E7CCD5!important;box-shadow:none!important}
+/* FE-108 — remove old invert filter which turned Ghost Buy illustrated bag white. */
+.hero-icon{display:grid!important;place-items:center!important;flex:none!important;width:64px!important;height:64px!important;filter:none!important;opacity:1!important;background:var(--fw-cream)!important;border:1px solid #F4E7ED!important;border-radius:18px!important;overflow:hidden!important}
+.hero-icon img{display:block!important;width:51px!important;height:51px!important;object-fit:contain!important;filter:none!important;opacity:1!important}
+.hero-cta{gap:12px!important;padding:16px 14px!important;overflow:hidden!important}
+.hero-cta>span:nth-child(2){min-width:0;flex:1}
+.hero-cta strong{font-size:17px!important}
+/* FE-109 — older green labels and Ghost Buy footer styles */
+.ghost-home-footer h2,.ghost-home-footer p,.decision-label,.date-label,.scan-found,.scan-found small{color:var(--fw-text)!important}
+.ghost-home-footer{background:var(--fw-sakura)!important;border-color:#E7D3DF!important}
+.scan-found,.scan-found.product-match{background:var(--fw-strawberry)!important;border-color:#E7D3DF!important;color:var(--fw-text)!important}
+.scan-found-icon{background:var(--fw-rose)!important}
+.savings-history-row>strong,.savings-number{color:#91657E!important}
+/* FE-110/114 — one large Ghosty scene for EVERY disposition. Never absolute-overlay icons on labels. */
+.ghost-activity{margin:14px 0!important;padding:20px 14px 17px!important;border-radius:25px!important;overflow:hidden}
+.ghost-activity .eyebrow{font-size:10px;margin:0 0 8px;text-align:center;color:#946775!important}
+.ghost-activity .activity-title{font-size:21px!important;line-height:1.25!important;text-align:center;margin:0 0 8px!important;color:var(--fw-text)!important}
+.activity-intro{font-size:13px;line-height:1.65;text-align:center;max-width:32ch;margin:0 auto 14px;color:var(--fw-text)}
+.ghost-activity .handover-summary{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 7px;padding:12px 9px!important;font-size:12px;line-height:1.5;color:var(--fw-text)!important}
+.ghost-activity .handover-scene{position:relative;display:flex!important;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important;gap:14px!important;min-height:236px!important;margin:14px 0 12px!important;padding:14px!important;background:var(--fw-cream)!important;border:1px solid #E7D3DF!important;overflow:hidden!important}
+.ghost-activity .handover-receiver{position:relative;flex:0 1 200px!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;width:min(100%,205px)!important;min-width:0!important;min-height:206px!important;border:2px dashed var(--fw-rose)!important;border-radius:24px!important;padding:7px!important;background:var(--fw-strawberry)!important;overflow:hidden!important}
+.ghost-activity .handover-receiver.is-targeted{background:#F5DCE5!important;transform:scale(1.03)!important}
+.ghost-activity .handover-ghost{display:block;width:100%!important;max-width:176px!important;height:168px!important;object-fit:contain!important;object-position:center!important;filter:drop-shadow(0 5px 7px #75646D20)!important;pointer-events:none}
+.ghost-activity .ghost-receive-label{font-size:13px;line-height:1.2;font-weight:800;position:relative;z-index:1;margin-top:1px;color:var(--fw-text)!important}
+.ghost-activity .handover-source{display:flex!important;justify-content:center!important;align-items:center!important;flex-direction:column-reverse!important;gap:6px!important;margin:6px auto 8px;min-width:0;width:100%!important}
+.ghost-activity .ghost-handover-food{width:min(100%,220px)!important;min-height:96px;display:grid;grid-template-columns:76px 1fr;grid-template-rows:repeat(2,auto);place-items:center;gap:0 10px;padding:10px!important;border-radius:17px;text-align:left;touch-action:none;z-index:1;position:relative}
+.ghost-activity .ghost-handover-food img{grid-row:1 / span 2;width:70px!important;height:73px!important;max-width:100%;object-fit:contain;justify-self:center}
+.ghost-activity .ghost-handover-food span{justify-self:start;font-size:12px;color:var(--fw-text)!important}
+.ghost-activity .ghost-handover-food strong{justify-self:start;font-size:16px}
+.ghost-activity .handover-arrow{font-size:22px;color:var(--fw-rose)!important}
+.ghost-activity .handover-instruction{font-size:13px!important;line-height:1.55;text-align:center;margin:11px 0 14px;min-height:0!important;color:var(--fw-text)!important}
+.ghosty-action-path{display:grid!important;grid-template-columns:55px minmax(0,105px);align-items:center;justify-content:center;gap:8px;position:relative;width:100%;max-width:230px;padding:10px 8px;background:white;border:1px solid #E7D3DF;border-radius:17px;min-height:87px;text-align:center;overflow:hidden}
+.ghosty-destination-image{width:55px!important;height:55px!important;object-fit:contain;grid-column:1;grid-row:1;z-index:1}
+.ghosty-destination-label{grid-column:2;grid-row:1;min-width:0;overflow-wrap:anywhere;font-size:12px;font-weight:700;line-height:1.45;color:var(--fw-text)!important}
+.ghosty-carry{position:absolute;left:17%;top:15px;width:44px;height:44px;z-index:2;pointer-events:none;opacity:0;animation:ghosty-handoff-v12 1.25s ease-in-out both}
+.ghosty-carry img{height:44px;width:44px;object-fit:contain}
+@keyframes ghosty-handoff-v12{0%{transform:translate(-105px,-60px) scale(.8);opacity:0}20%{opacity:1}55%{transform:translate(-55px,-45px) scale(.9);opacity:1}86%{transform:translate(0,0) scale(.7);opacity:1}100%{transform:translate(0,0) scale(.3);opacity:0}}
+.ghost-activity.activity-complete .handover-receiver{border-style:solid!important}
+.ghost-activity.activity-complete .handover-ghost{animation:ghosty-celebrate-v12 1.15s ease both}
+@keyframes ghosty-celebrate-v12{0%{transform:scale(1)}40%{transform:rotate(-6deg) scale(1.04)}70%{transform:rotate(3deg)}100%{transform:scale(1)}}
+.ghost-activity .activity-accessible{margin-top:10px}
+.ghost-no-remainder{text-align:center;padding:10px}
+/* FE-111 — larger product header and BIG Ghosty result illustration. */
+.item-strip.story-item-info{min-height:108px!important;padding:19px 18px!important;border-radius:21px!important;background:var(--fw-peach)!important;display:flex;align-items:center!important;gap:10px}
+.item-strip.story-item-info strong{font-size:22px!important;line-height:1.25!important;color:var(--fw-text);word-break:break-word}
+.item-strip.story-item-info small{display:block;font-size:13px!important;line-height:1.6;margin-top:4px;color:var(--fw-text)}
+.results-panel{background:var(--fw-strawberry)!important;padding:23px 18px!important;border-radius:25px!important}
+.results-panel h1{font-size:27px!important;line-height:1.16}
+.ghost-result-visual{display:flex;align-items:center;justify-content:space-around;gap:8px;margin-top:21px;border-radius:18px;padding:9px;background:var(--fw-cream);min-height:148px;overflow:hidden}
+.ghost-result-visual>img{height:149px;width:53%;max-width:170px;object-fit:contain;flex:0 1 53%}
+.ghost-result-caption{font-size:12px;line-height:1.5;flex:1;min-width:0;overflow-wrap:anywhere;color:var(--fw-text)}
+/* FE-113 — manual consumption and purchase-quantity inputs */
+.story-custom-quantity{padding:12px 0 0;margin-top:15px;border-top:1px solid #E7D3DF}
+.story-custom-quantity .field{margin:7px 0 9px}
+.story-custom-quantity .field>span{font-size:12px;line-height:1.5}
+.story-custom-quantity .button{margin:0}
+/* Touch, sticky footer clearance, narrow 320px test. */
+@media(max-width:360px){
+ #main{padding-left:15px!important;padding-right:15px!important;padding-bottom:150px!important}
+ .auth-page{padding:17px 12px!important}
+ .ghost-activity .handover-scene{min-height:225px!important;padding:10px!important}
+ .ghost-activity .handover-receiver{max-width:185px!important}
+ .ghost-activity .handover-ghost{height:152px!important}
+ .ghost-result-visual>img{height:130px}
+ .item-strip.story-item-info strong{font-size:19px!important}
+ .hero-icon{width:54px!important;height:54px!important}.hero-icon img{width:46px!important;height:46px!important}
+}
+@media(prefers-reduced-motion:reduce){.ghosty-carry,.ghost-activity.activity-complete .handover-ghost{animation:none!important}}
+body.reduce-motion .ghosty-carry,body.no-story-animations .ghosty-carry,body.reduce-motion .ghost-activity.activity-complete .handover-ghost,body.no-story-animations .ghost-activity.activity-complete .handover-ghost{animation:none!important}
+/* Final visual inspection: keep the Ghosty caption below—not on—the drawing. */
+.ghost-activity .handover-receiver{min-height:224px!important;padding-bottom:13px!important;justify-content:space-between!important}
+.ghost-activity .handover-ghost{height:170px!important;flex:none!important}
+.ghost-activity .ghost-receive-label{display:block!important;background:#FFF9F6!important;padding:4px 12px!important;border-radius:10px!important;margin:3px 0 0!important;line-height:1.25!important}
+.ghost-activity.activity-complete .handover-destination{display:none!important}
+.scan-file:focus-within{outline:3px solid #DDA5B6!important;outline-offset:2px}
+@media(max-width:360px){.ghost-activity .handover-ghost{height:155px!important}.ghost-activity .handover-receiver{min-height:214px!important}}
+
+/* Approved larger Ghosty on result, separate destination illustration and prose. */
+.ghost-result-visual{min-height:197px!important;gap:12px!important;padding:12px 9px!important}
+.ghost-result-visual>img{height:185px!important;max-width:186px!important;width:56%!important;flex:0 1 56%!important}
+.ghost-result-caption{min-width:0!important;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.ghost-result-caption p{margin:0!important;font-size:12px!important;line-height:1.5}
+.ghost-result-action{display:block;width:65px;height:65px;object-fit:contain;flex:none}
+@media(max-width:360px){.ghost-result-visual>img{height:164px!important}.ghost-result-action{width:51px;height:51px}}

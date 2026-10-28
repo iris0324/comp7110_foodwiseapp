@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+import {seed} from '../js/data/seed.js';
+import {ghostScreen} from '../js/ui/screens/ghost-v8.js';
+import {storyScreen} from '../js/ui/screens/story.js';
+import {executeCommand} from '../js/domain/commands.js';
+import {setLanguage} from '../js/i18n/index.js';
+const base=new URL('../',import.meta.url);
+let n=0,s=seed('en','preview-epoch','2026-10-28T02:00:00.000Z');
+const cmd=(type,payload)=>{const r=executeCommand(s,{type,payload,operationId:'preview_'+n++,epoch:s.epoch,issuedAt:'2026-10-28T02:30:00.000Z',expectedRevision:s.revision});s=r.state;return r.result;};
+setLanguage('en');
+const row={cartItemId:'x',name:'ChocoPop • Milk Chocolate Bar',quantity:'2',price:'5',note:'',asset:'chocolate'};
+cmd('cart_save',{rows:[row]});const {purchaseId,itemIds}=cmd('checkout',{});
+cmd('story_start',{itemId:itemIds[0],source:'preset',template:'amount'});
+cmd('story_answer',{itemId:itemIds[0],value:'half'});
+const css=['tokens.css','base.css','components.css','screens.css','motion.css','peach-jam.css','integration.css','refinement-v8.css'].map(x=>fs.readFileSync(new URL('styles/'+x,base),'utf8')).join('\n');
+const toData=(str)=>str.replace(/src="assets\/([^"?#]+)"/g,(_,f)=>{const p=new URL('assets/'+f,base);if(!fs.existsSync(p))return `src=""`;const ext=f.split('.').at(-1);return 'src="data:image/'+(ext==='jpg'?'jpeg':ext)+';base64,'+fs.readFileSync(p).toString('base64')+'"';});
+function make(name,body,nav='ghost'){const header=`<header class="app-head"><span class="wordmark small"><img class="logo-ghost" src="assets/ghosty/happy.png"><span>Food<span class="wise-accent">Wise</span></span></span><div class="row"><button class="lang-button">中文</button><button class="icon-button">☼</button></div></header>`;const bottom=`<nav class="bottom-nav"><button>⌂<span>Home</span></button><button>▣<span>Food Management</span></button><button class="active">♧<span>Ghost Buy</span></button></nav>`;
+ const content=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div class="app-shell">${header}<main id="main">${body}</main>${bottom}</div></body></html>`;
+ fs.writeFileSync('/mnt/data/preview_'+name+'.html',toData(content));}
+make('ghost',ghostScreen({s,r:{page:'ghost-home',id:''},e:null}));
+make('cart',ghostScreen({s,r:{page:'cart',id:''},e:{type:'cart',rows:[]}}));
+make('story',storyScreen({s,r:{page:'story',id:itemIds[0]},e:{fields:{}},playing:null,phase:'result'}));
+make('choose',ghostScreen({s,r:{page:'choose-item',id:purchaseId},e:null}));
+console.log('Generated design previews');
