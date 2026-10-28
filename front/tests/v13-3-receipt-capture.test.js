@@ -58,7 +58,7 @@ test('published GitHub Pages includes a real local QR decoder, not only README',
  assert.match(deploy,/front\/js\/vendor\/jsQR\.js/);
  assert.match(deploy,/test -s front\/js\/vendor\/jsQR\.js/);
  assert.match(deploy,/path: \.\/front/);
- assert.match(html,/js\/main\.js\?v=13\.3/);
+ assert.match(html,/js\/main\.js\?v=13\.(?:3|4)/);
 });
 
 test('eight genuine QR fixture image files match the eight receipt IDs in catalog',()=>{
