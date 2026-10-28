@@ -30,8 +30,8 @@ test('every browser document begins at Welcome regardless of prior guest status 
  assert.match(main,/entryPage\(page,guestEnteredThisLaunch\)/);
  assert.match(main,/entryPage\(next\.page,guestEnteredThisLaunch\)/);
  assert.doesNotMatch(main,/localStorage\.setItem\(ONBOARDING_KEY,'guest'\)/);
- assert.match(main,/if\(name==='enter-guest'\)\{guestEnteredThisLaunch=true/);
- assert.match(main,/supabase.auth.signOut\(\)/);
+ assert.match(main,/if\(name==='enter-guest'\)[\s\S]*?guestEnteredThisLaunch=true/);
+ assert.match(main,/signOutAndClear/);
  assert.ok(main.includes('data-action="exit-guest"'));
  assert.equal(ONBOARDING_KEY,'fw-onboarding-v11-1');
 });

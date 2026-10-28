@@ -1,3 +1,5 @@
+import {seed} from './data/seed.js?v=13.0';
+import {signOutAndClear,foodSavePage} from './services/food-session-flow.js';
 import {supabase,redirectURL} from './services/supabase.js';
 import {Repository} from './storage/repository.js?v=13.0';
 import {Store} from './app/store.js?v=13.0';
@@ -22,7 +24,7 @@ const store=new Store(new Repository());
 const catalog=new CatalogService();
 const animator=new Animator();
 let motionSheetAvailable=true;let cartSaveTimer=null;let cameraStream=null;let cameraUnavailable=false;let cameraRequest=0;let activityPlayedKey='';
-let guestEnteredThisLaunch=false;
+let guestEnteredThisLaunch=false;let signingOut=false;
 let current=route(),editor=null,editorBaseline='',modal=null,modalFocus=null,cleanupFeed=()=>{},playing=null,phase='result',message='',generating=false,external=false,previewToken=0;
 const filters={search:'',category:'',status:'available'};
 const blankFood=()=>({name:'',quantity:'1',unit:'',category:'other',recordedDate:'',location:'',planDate:''});
@@ -277,8 +279,19 @@ async function action(name,value){
  if(store.pending||store.status==='saving')return;
  if(name==='back'){goBack();return;}
  if(name==='story-back'){const st=getStory(store.state,current.id);if(!st||st.status==='completed')return;activityPlayedKey='';store.commit('story_back',{itemId:current.id});return;}
- if(name==='enter-guest'){guestEnteredThisLaunch=true;navigateNow('home');return;}
- if(name==='exit-guest'){if(supabase){const {error}=await supabase.auth.signOut();if(error){store.error=error.message;render();return;}}location.reload();return;}
+ if(name==='enter-guest'){if(!store.repository.local){await store.open();setLanguage(store.state.settings.language);}guestEnteredThisLaunch=true;navigateNow('home');return;}
+ if(name==='exit-guest'){
+ signingOut=true;
+ try{await signOutAndClear(store.repository.user?supabase:null,async()=>{
+  clearTimeout(cartSaveTimer);cartSaveTimer=null;stopCamera();releaseEditor();haltMotion();
+  store.repository.close();store.repository.user=null;store.repository.local=null;
+  store.pending=null;store.error=null;store.status='idle';store.state=seed(getLanguage(),uid());
+  activeUser=null;guestEnteredThisLaunch=false;external=false;filters.search='';filters.category='';filters.status='available';
+  navigateNow('login','',true);
+  await store.open();
+ });}catch(error){store.error=getLanguage()==='zh'?'登出失敗，請稍後再試。':'Log out failed. Please try again.';render();}finally{signingOut=false;}
+ return;
+ }
  if(name==='settings-toggle'){const enabled=!store.state.settings[value];if(value==='phoneNotifications'&&enabled){if(!('Notification'in window)){message='notificationPermission';render();return;}try{const permitted=await Notification.requestPermission();if(permitted!=='granted'){message='notificationPermission';render();return;}}catch{message='notificationPermission';render();return;}}store.commit('settings_update',{values:{[value]:enabled}});return;}
  if(name==='reminder-days'){store.commit('settings_update',{values:{nearDateDays:Number(value)}});return;}
  if(name==='language'){haltMotion();store.commit('language',{language:value||(getLanguage()==='en'?'zh':'en')});return;}
@@ -356,7 +369,7 @@ async function submit(kind){
  if(result.data?.session){location.reload();return;}navigateNow('verify-email');return;
  }
  if(kind==='reset-password'){const password=new FormData(document.querySelector('[data-form="reset-password"]')).get('password');const {error}=await supabase.auth.updateUser({password});if(error)throw error;location.reload();return;}
- if(kind==='food'){foodFields(editor.fields);if(current.page!=='food-new'&&qty(editor.fields.remaining)==='0'){openModal({type:'zero',fields:clone(editor.fields)});return;}store.commit(current.page==='food-new'?'food_add':'food_edit',{id:current.id,fields:editor.fields},[],result=>navigateNow('food-detail',result.id||current.id));}
+ if(kind==='food'){foodFields(editor.fields);if(current.page!=='food-new'&&qty(editor.fields.remaining)==='0'){openModal({type:'zero',fields:clone(editor.fields)});return;}store.commit(current.page==='food-new'?'food_add':'food_edit',{id:current.id,fields:editor.fields},[],result=>navigateNow(foodSavePage(current.page==='food-new'),current.page==='food-new'?'':result.id||current.id));}
  if(kind==='food-use'){const n=qty(editor.fields.remaining);if(n==='0')openModal({type:'zero'});else store.commit('food_remaining',{id:current.id,remaining:n},[],()=>navigateNow('food-detail',current.id));}
  if(kind==='food-plan')store.commit('food_plan',{id:current.id,planDate:editor.fields.planDate},[],()=>navigateNow('food-detail',current.id));
  if(kind==='product-review-next'){cartFields(editor.rows.find(x=>x.cartItemId===current.id));if(editor.photoStatus==='scanning')return;editor.productStep='confirm';message='';render();window.scrollTo(0,0);}
@@ -465,11 +478,15 @@ async function boot(){try{await catalog.load();await store.open();activeUser=sto
  localStorage.removeItem(ONBOARDING_KEY); // remove only obsolete entry flag
  const recovery=sessionStorage.getItem('fw-password-recovery')==='yes';
  sessionStorage.removeItem('fw-password-recovery');
- const page=recovery?'reset-password':guestEnteredThisLaunch?'home':initialPage();
+ const page=recovery?'reset-password':guestEnteredThisLaunch?'home':route().page==='login'?'login':initialPage();
  current={page,id:''};history.replaceState(null,'',path(page));
  prepareEditor(current);render();window.__foodwiseReady=true;checkPhoneReminders();}catch(error){window.__foodwiseReady=true;$('#app').innerHTML=`<main class="loading"><h1>FoodWise</h1><p role="alert">${esc(t(error.message)||t('scanCatalogError'))}</p><button id="retry-open" class="button">${t('retryOpen')}</button></main>`;$('#retry-open').onclick=boot;}}
 let activeUser=null;let authReady=false;
 supabase?.auth.onAuthStateChange((event,session)=>{
+ if(signingOut)return;
+ if(authReady&&activeUser&&!session){
+  clearTimeout(cartSaveTimer);stopCamera();releaseEditor();haltMotion();store.pending=null;store.state=seed(getLanguage(),uid());store.repository.close();store.repository.user=null;store.repository.local=null;guestEnteredThisLaunch=false;activeUser=null;navigateNow('login','',true);location.reload();return;
+ }
  if(event==='PASSWORD_RECOVERY'){sessionStorage.setItem('fw-password-recovery','yes');location.reload();return;}
  if(!authReady||event==='INITIAL_SESSION'){activeUser=session?.user?.id||null;return;}
  if(activeUser!==(session?.user?.id||null)){location.reload();return;}
