@@ -1,8 +1,7 @@
-# QR decoder vendor assets
+# QR-decoder dependency (v13.2)
 
-For full offline / CDN-independent browser QR decoding, place the official verified upstream browser distributions at these paths:
+The GitHub Pages workflow downloads and packages the official jsQR 1.4.0 browser distribution at `js/vendor/jsQR.js` plus its Apache-2.0 `LICENSE` on every deployment. It must be present in the published website to ensure iPhone scanning does not rely on runtime CDN requests. No third-party source has been fabricated or vendored without its license.
 
-- `jsQR.js` — jsQR 1.4.0, `dist/jsQR.js`, from https://github.com/cozmo/jsQR, Apache-2.0 license.
-- `zxing.min.js` — `@zxing/library` 0.21.3 browser UMD build, from https://github.com/zxing-js/library, Apache-2.0 license.
+For local VS Code development with internet, the scanner also attempts to load jsQR 1.4.0 from jsDelivr or unpkg when the local script is absent. Offline local development requires downloading the same upstream distribution first. Browser BarcodeDetector and ZXing are independent fallbacks. 
 
-This environment could not access npm/CDN during packaging, so no third-party code was fabricated. The scanner attempts these two local assets first, then their public CDN URLs; BarcodeDetector is the last fallback. For fully offline testing, add the vendor assets and verify licenses. Do not describe the QR fallback as fully offline before this step has passed.
+Official source: https://github.com/cozmo/jsQR — Apache-2.0.
