@@ -19,10 +19,11 @@ test('photograph becomes visible immediately: preview creation never waits for Q
   assert.equal(preview,'blob:test-receipt.jpg');
   assert.match(main,/url=await receiptServices\.decode\(file\)/);
   const previewIndex=main.indexOf('url=await receiptServices.decode(file)');
-  const scanIndex=main.indexOf('const codes=await decodeQRPhoto(file)',previewIndex);
+  const scanIndex=main.indexOf('const codes=await decodeQRPhoto(ref.blob)',previewIndex);
   assert.ok(previewIndex>0 && scanIndex>previewIndex);
-  assert.match(main,/photoStatus:'scanning'/);
-  assert.match(main,/photoStatus='ready';ref\.photoIssue=photoMessage\(error\)/);
+  assert.match(main,/photoStatus:'ready'/);
+  assert.match(main,/ref.photoStatus='scanning'/);
+  assert.match(main,/ref.photoStatus='ready'/);
  }finally{globalThis.URL=old;}
 });
 
@@ -58,7 +59,7 @@ test('published GitHub Pages includes a real local QR decoder, not only README',
  assert.match(deploy,/front\/js\/vendor\/jsQR\.js/);
  assert.match(deploy,/test -s front\/js\/vendor\/jsQR\.js/);
  assert.match(deploy,/path: \.\/front/);
- assert.match(html,/js\/main\.js\?v=13\.(?:3|4)/);
+ assert.match(html,/js\/main\.js\?v=13\.(?:3|4|5)/);
 });
 
 test('eight genuine QR fixture image files match the eight receipt IDs in catalog',()=>{

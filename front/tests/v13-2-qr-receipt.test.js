@@ -45,17 +45,17 @@ test('CLOES FW-R01 QR yields five review rows, not a blank Add Missing Item scre
  assert.equal(rows.length,5);
  assert.deepEqual(rows.map(r=>r.name),['Full Cream Milk 1L','Wholemeal Bread','Free Range Eggs 6pk','Bananas 1kg','Greek Yoghurt 700g']);
  setLanguage('en');
- const html=foodScreen({s:seed(),r:{page:'receipt'},e:{type:'receipt',rows,imageUrl:'blob:real-photo',photoStatus:'ready',photoIssue:'',storeName:receipt.store,receiptId:receipt.receipt_id,receiptTotal:receipt.total},filters:{}});
- assert.match(html,/Receipt recognised/);
+ const html=foodScreen({s:seed(),r:{page:'receipt'},e:{type:'receipt',rows,imageUrl:'blob:real-photo',photoStatus:'ready',photoIssue:'',reviewStep:'review',storeName:receipt.store,receiptId:receipt.receipt_id,receiptTotal:receipt.total},filters:{}});
+ assert.match(html,/Items from this receipt/);
  assert.match(html,/Full Cream Milk/);
  assert.match(html,/Greek Yoghurt/);
- assert.match(html,/data-action="receipt-confirm"/);
+ assert.match(html,/data-action="receipt-review-next"/);
  assert.match(html,/data-action="receipt-add"/);
 });
 
 test('scanning screen waits for QR results before offering missing-item fallback',()=>{
  const html=foodScreen({s:seed(),r:{page:'receipt'},e:{type:'receipt',rows:[],imageUrl:'blob:captured',photoStatus:'scanning',photoIssue:''},filters:{}});
- assert.match(html,/Reading the receipt QR code/);
+ assert.match(html,/Scanning receipt/);
  assert.doesNotMatch(html,/data-action="receipt-add"/);
 });
 
@@ -81,5 +81,6 @@ test('QR recognition tries receipt-bottom crops and bounds library loads',()=>{
  assert.match(scannerSource,/scanUnsupported/);
  assert.match(source,/catalog\.receipt\(code\)/);
  assert.match(source,/rows:catalog\.receiptRows\(match,uid\)/);
- assert.match(foodSource,/e\.photoStatus!=='scanning'\?btn\('addRow'/);
+ assert.match(foodSource,/data-action="receipt-add"/);
+ assert.match(source,/scanConfirmedReceipt/);
 });

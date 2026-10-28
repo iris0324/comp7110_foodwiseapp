@@ -38,9 +38,13 @@ test('Food Management: immediately displays captured receipt before QR recogniti
  await tick();
  assert.equal(context.current.page,'receipt');
  assert.equal(reference.imageUrl,'blob:photo-preview');
+ assert.equal(reference.photoStatus,'ready');
+ assert.equal(reference.reviewStep,'photo');
+ assert.equal(typeof resolveScan,'undefined');
+ const scanTask=context.scanConfirmedReceipt();await tick();
  assert.equal(reference.photoStatus,'scanning');
  assert.ok(events.some(x=>x.render==='receipt'&&x.photo==='blob:photo-preview'));
- resolveScan([]);await task;
+ resolveScan([]);await scanTask;
  assert.equal(reference.imageUrl,'blob:photo-preview','an unrecognised QR cannot discard a successful photo');
  assert.equal(reference.photoIssue,'no_match');
  assert.equal(events.includes('saved-draft'),true,'receipt image auto-saved locally');
@@ -48,27 +52,34 @@ test('Food Management: immediately displays captured receipt before QR recogniti
 test('Food Management: QR exception preserves the receipt photo and allows a manual review',async()=>{
  const {context,reference}=harness('receipt',async()=>{throw Object.assign(new Error('scanNotFound'),{code:'scanNotFound'});});
  await context.chooseImage({type:'image/jpeg',name:'photo.jpg'});
+ await context.scanConfirmedReceipt();
  assert.equal(reference.photoIssue,'no_match');
  assert.equal(reference.imageUrl,'blob:photo-preview');
  setLanguage('en');
  const html=foodScreen({s:seed(),r:{page:'receipt'},e:reference,filters:{}});
  assert.match(html,/Your receipt photo/);
  assert.match(html,/Retake Photo/);
- assert.match(html,/data-action="receipt-add"/);
+ assert.doesNotMatch(html,/data-action="receipt-add"/);
+ assert.match(html,/data-action="receipt-photo-confirm"/);
  assert.doesNotMatch(html,/data-action="receipt-confirm"/);
 });
 test('Food Management: recognised receipt retains the photo and exposes review and confirm',async()=>{
  const {context,reference}=harness('receipt',async()=>['KNOWN']);
  await context.chooseImage({type:'image/jpeg',name:'receipt.jpg'});
+ assert.equal(reference.rows.length,0,'no automatic scan before user confirmation');
+ await context.scanConfirmedReceipt();
  assert.equal(reference.rows.length,1);
  assert.equal(reference.imageUrl,'blob:photo-preview');
  assert.equal(reference.qrPayload,'KNOWN');
  const html=foodScreen({s:seed(),r:{page:'receipt'},e:reference,filters:{}});
- assert.match(html,/data-action="receipt-confirm"/);
+ assert.match(html,/data-action="receipt-review-next"/);
 });
 test('Ghost Buy: unrecognised product keeps photo, opens review after camera, no silent reset',async()=>{
  const {context,events,reference}=harness('product',async()=>[]);
  await context.chooseProductImage({type:'image/jpeg',name:'chips.jpg'});
+ assert.equal(reference.productStep,'photo');
+ await context.scanConfirmedProduct();
+ assert.equal(reference.productStep,'details');
  assert.equal(context.current.page,'product-review');
  assert.equal(reference.productPhotoUrl,'blob:photo-preview');
  assert.equal(reference.rows[0].photoId,'photo-123');
@@ -76,9 +87,9 @@ test('Ghost Buy: unrecognised product keeps photo, opens review after camera, no
  assert.ok(!events.includes('revoke'));
  setLanguage('en');
  const html=ghostScreen({s:seed(),r:{page:'product-review',id:'cart-1'},e:reference});
- assert.match(html,/Your product photo/);
- assert.match(html,/Retake Photo/);
- assert.match(html,/data-form="ghost-add"/);
+ assert.match(html,/Item Details/);
+ assert.match(html,/Back to Photo/);
+ assert.match(html,/data-form="product-review-next"/);
  assert.match(html,/Estimated Price/);
 });
 test('Both camera inputs support genuine native capture and independent album selection',()=>{
