@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-22",
+  "id": "sprite-enjoy-frames-v2",
+  "file": "sprite-enjoy-frames-v2.png",
+  "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-6c24c54b-d2ea-4a29-aa22-0626b20d3a3d.png",
+  "prompt": "Use case: identity-preserve. Asset type: ONE transparent 2 by 2 animation sprite sheet for the FoodWise 2D illustrated companion. Input images are identity/style references: preserve the EXACT mint green furry character, cream belly and huge cream inner ears, dark brown outlines, coral cheek blush, plant terrarium backpack. Match the first reference's full-body view, proportions and paw placement closely. Output a square canvas with EXACTLY FOUR equally sized square cells, aligned as a 2x2 grid. Each cell is an animation frame of the SAME character at identical scale, head position, feet baseline and framing, facing slightly right; each character entirely fits inside its cell with about 10 percent transparent margin. No cell borders or labels, NO TEXT. Real transparent alpha across all empty areas, no checkerboard or background. TOP LEFT: eyes open, both EMPTY paws just below muzzle, mouth visibly open to receive a bite. TOP RIGHT: content eyes gently closed, mouth closed puckered toward right, LEFT cheek rounded and puffed to show chewing. BOTTOM LEFT: same pose, mouth closed puckered toward left, RIGHT cheek rounded and puffed to show the alternating chew; ears slightly relaxed. BOTTOM RIGHT: swallowing finished, both paws lowered a little, satisfied gentle smile and closed crescent eyes, slight happy head tilt. The changes must be clearly legible as a chewing animation at small UI sizes, yet maintain tight frame-to-frame alignment. No food, no cup, no plate, no extra objects or characters. Soft hand-painted storybook illustration consistent with reference, NOT 3D. Intended for CSS background-position animation; preserve a crisp four-cell grid.",
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "layout": "2x2, receive / chew-left / chew-right / satisfied; rendered with CSS background-position, original alpha preserved"
+}

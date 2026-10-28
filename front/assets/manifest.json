@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-22",
+  "reference": "../../../精灵图片.jpg",
+  "assets": [
+    {
+      "id": "sprite-welcome",
+      "file": "sprite-welcome.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-3df9e195-d16a-4e6c-8985-ed7b5a6f9a1f.png",
+      "prompt": "Use case: illustration-story. Asset type: a single transparent PNG mascot sprite for FoodWise mobile UI. The input is a CHARACTER IDENTITY REFERENCE sheet, not the requested output. Preserve this exact mint-green cute round creature, big ears with cream insides, cream belly, dark brown eyes, small muzzle, coral cheeks, little tufts, and the transparent plant terrarium backpack with brown soil, yellow seed and green sprout. Match the reference's soft outlined 2D storybook illustration, NOT 3D, on truly transparent background. Single full-body character, front three-quarter view, centered with generous transparent padding, all feet and ears visible. No other characters, no text, no labels, no watermark, no checkerboard pixels, no backdrop or rectangular ground. Pose: warm welcoming smile, one paw raised in a small wave, the other resting at its side, standing naturally. Reference the Happy/Encouraging pose, calm joy.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "sprite-think",
+      "file": "sprite-think.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-e14d1990-43db-486a-8ba2-3f106455aeb5.png",
+      "prompt": "Use case: illustration-story. Asset type: a single transparent PNG mascot sprite for FoodWise mobile UI. The input is a CHARACTER IDENTITY REFERENCE sheet, not the requested output. Preserve this exact mint-green cute round creature, big ears with cream insides, cream belly, dark brown eyes, small muzzle, coral cheeks, little tufts, and the transparent plant terrarium backpack with brown soil, yellow seed and green sprout. Match the reference's soft outlined 2D storybook illustration, NOT 3D, on truly transparent background. Single full-body character, front three-quarter view, centered with generous transparent padding, all feet and ears visible. No other characters, no text, no labels, no watermark, no checkerboard pixels, no backdrop or rectangular ground. Pose: gentle thinking, seated with one paw lightly against cheek, open friendly eyes looking slightly upward, small contemplative smile. No sadness, no guilt, no checklist or calendar.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "sprite-enjoy",
+      "file": "sprite-enjoy.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-5bda195d-8be5-43da-8a13-8b5e9917027d.png",
+      "prompt": "Use case: illustration-story. Asset type: a single transparent PNG mascot sprite for FoodWise mobile UI. The input is a CHARACTER IDENTITY REFERENCE sheet, not the requested output. Preserve this exact mint-green cute round creature, big ears with cream insides, cream belly, dark brown eyes, small muzzle, coral cheeks, little tufts, and the transparent plant terrarium backpack with brown soil, yellow seed and green sprout. Match the reference's soft outlined 2D storybook illustration, NOT 3D, on truly transparent background. Single full-body character, front three-quarter view, centered with generous transparent padding, all feet and ears visible. No other characters, no text, no labels, no watermark, no checkerboard pixels, no backdrop or rectangular ground. Pose: enjoying an imagined bite, standing, both paws near its mouth, content closed eyes, cheeks slightly rounded, warm relaxed smile. One tiny chocolate bite between paws, without plates or large props.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "sprite-store",
+      "file": "sprite-store.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-8a3d15ed-6269-463d-9b28-8fb198886a41.png",
+      "prompt": "Use case: illustration-story. Asset type: a single transparent PNG mascot sprite for FoodWise mobile UI. The input is a CHARACTER IDENTITY REFERENCE sheet, not the requested output. Preserve this exact mint-green cute round creature, big ears with cream insides, cream belly, dark brown eyes, small muzzle, coral cheeks, little tufts, and the transparent plant terrarium backpack with brown soil, yellow seed and green sprout. Match the reference's soft outlined 2D storybook illustration, NOT 3D, on truly transparent background. Single full-body character, front three-quarter view, centered with generous transparent padding, all feet and ears visible. No other characters, no text, no labels, no watermark, no checkerboard pixels, no backdrop or rectangular ground. Pose: carefully putting a small plain cream food container with pale yellow lid beside its feet, bending slightly, attentive neutral smile. The container is closed, no lettering. Backpack remains visible.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "sprite-share",
+      "file": "sprite-share.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-ba6cda15-ede6-402b-be1b-f098f6ff593d.png",
+      "prompt": "Use case: illustration-story. Asset type: a single transparent PNG mascot sprite for FoodWise mobile UI. The input is a CHARACTER IDENTITY REFERENCE sheet, not the requested output. Preserve this exact mint-green cute round creature, big ears with cream insides, cream belly, dark brown eyes, small muzzle, coral cheeks, little tufts, and the transparent plant terrarium backpack with brown soil, yellow seed and green sprout. Match the reference's soft outlined 2D storybook illustration, NOT 3D, on truly transparent background. Single full-body character, front three-quarter view, centered with generous transparent padding, all feet and ears visible. No other characters, no text, no labels, no watermark, no checkerboard pixels, no backdrop or rectangular ground. Pose: offering a small cream plate holding half a simple chocolate bar outward with both paws, open friendly eyes and warm smile, feet planted. No second character, no text.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "food-chocolate",
+      "file": "food-chocolate.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-21cfcfa0-6c7e-4a12-9e4c-0b862124a555.png",
+      "prompt": "Use case: illustration-story. Asset type: one transparent PNG food illustration for FoodWise mobile app. Input is STYLE REFERENCE only: match the soft dark-brown outline, subtle watercolor shading and playful 2D storybook style. Produce one standalone food object, centered, generous transparent margins, clear readable silhouette at 50 pixels. Genuine transparent alpha background, NO checkerboard, text, labels, logos, hands, characters, scenery or cast ground shadow. Subject: a small unbranded chocolate bar with six raised chocolate squares, partly open cream-and-coral paper wrapper, view from slightly above.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "food-milk",
+      "file": "food-milk.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-523917fb-90e9-44f0-9f62-31bea2c91b8c.png",
+      "prompt": "Use case: illustration-story. Asset type: one transparent PNG food illustration for FoodWise mobile app. Input is STYLE REFERENCE only: match the soft dark-brown outline, subtle watercolor shading and playful 2D storybook style. Produce one standalone food object, centered, generous transparent margins, clear readable silhouette at 50 pixels. Genuine transparent alpha background, NO checkerboard, text, labels, logos, hands, characters, scenery or cast ground shadow. Subject: a small unbranded cream milk carton with mint-green side panels and a simple pale-blue circle, no lettering, cap closed.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "food-tomato",
+      "file": "food-tomato.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-4135c4f1-c213-442c-b5c5-5b603919ff9e.png",
+      "prompt": "Use case: illustration-story. Asset type: one transparent PNG food illustration for FoodWise mobile app. Input is STYLE REFERENCE only: match the soft dark-brown outline, subtle watercolor shading and playful 2D storybook style. Produce one standalone food object, centered, generous transparent margins, clear readable silhouette at 50 pixels. Genuine transparent alpha background, NO checkerboard, text, labels, logos, hands, characters, scenery or cast ground shadow. Subject: two plump coral-red tomatoes with fresh green leaves, one slightly behind the other.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "food-banana",
+      "file": "food-banana.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-d0a619b3-ef38-4426-ad22-0dffa5a9905f.png",
+      "prompt": "Use case: illustration-story. Asset type: one transparent PNG food illustration for FoodWise mobile app. Input is STYLE REFERENCE only: match the soft dark-brown outline, subtle watercolor shading and playful 2D storybook style. Produce one standalone food object, centered, generous transparent margins, clear readable silhouette at 50 pixels. Genuine transparent alpha background, NO checkerboard, text, labels, logos, hands, characters, scenery or cast ground shadow. Subject: a small bunch of three ripe warm-yellow bananas, no brown rot, curved playful silhouette.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "food-bag",
+      "file": "food-bag.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-a9cff375-9513-4e84-a763-eaa7c92e7d02.png",
+      "prompt": "Use case: illustration-story. Asset type: one transparent PNG food illustration for FoodWise mobile app. Input is STYLE REFERENCE only: match the soft dark-brown outline, subtle watercolor shading and playful 2D storybook style. Produce one standalone food object, centered, generous transparent margins, clear readable silhouette at 50 pixels. Genuine transparent alpha background, NO checkerboard, text, labels, logos, hands, characters, scenery or cast ground shadow. Subject: a small cream reusable grocery bag, short warm-brown handles, one simple green leaf emblem, a glimpse of yellow and green food shapes peeking out, no words.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "sprite-sip",
+      "file": "sprite-sip.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-01021091-19d7-42ad-bfdd-c62417271bcd.png",
+      "prompt": "Use case: illustration-story. Asset type: one full-body transparent FoodWise mascot sprite. Keep the exact identity of the provided mint-green creature: large cream ears, cream belly, dark-brown eyes, coral cheeks, tufts and plant terrarium backpack. Soft outlined 2D storybook illustration as reference. Pose: peacefully taking a sip from a small plain cream cup held in both paws at mouth height, eyes content, standing with all feet and ears visible. Full body centered with transparent margin. Genuine transparent alpha background. No text, labels, checkerboard, extra characters, scenery.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "sprite-enjoy-neutral",
+      "file": "sprite-enjoy-neutral.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-f723c93b-31b0-4ce4-b33c-2c21e3078155.png",
+      "prompt": "Use case: illustration-story. Asset type: a single full-body transparent FoodWise mascot sprite, based on this exact character identity. Keep the mint-green creature, large cream ears and belly, coral cheeks, tufts, brown eyes and plant terrarium backpack. Soft outlined 2D storybook illustration, truly transparent alpha. Centered full body, no checkerboard, background, text, labels or extra character. Pose: content expression while enjoying an imagined bite, eyes softly closed, cheeks rounded, small smile, both paws near mouth. IMPORTANT: NO visible food, no cup or plate, so this sprite can represent any food type.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "id": "sprite-share-neutral",
+      "file": "sprite-share-neutral.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-2708d846-ce4b-4b66-96fc-0c7ffdda2f48.png",
+      "prompt": "Use case: illustration-story. Asset type: a single full-body transparent FoodWise mascot sprite, based on this exact character identity. Keep the mint-green creature, large cream ears and belly, coral cheeks, tufts, brown eyes and plant terrarium backpack. Soft outlined 2D storybook illustration, truly transparent alpha. Centered full body, no checkerboard, background, text, labels or extra character. Pose: offering and sharing gesture with both paws extended forward, open palms facing upward, friendly open eyes and a warm small smile. IMPORTANT: paws empty, NO food, cup, container or plate, to support any food type.",
+      "tool": "built-in image_gen",
+      "transparent_background": true
+    },
+    {
+      "date": "2026-10-22",
+      "id": "sprite-enjoy-frames-v2",
+      "file": "sprite-enjoy-frames-v2.png",
+      "source": "/Users/yang/.codex/generated_images/01a15e4f-b3c8-7fc0-b302-e7b0b565db7b/exec-6c24c54b-d2ea-4a29-aa22-0626b20d3a3d.png",
+      "prompt": "Use case: identity-preserve. Asset type: ONE transparent 2 by 2 animation sprite sheet for the FoodWise 2D illustrated companion. Input images are identity/style references: preserve the EXACT mint green furry character, cream belly and huge cream inner ears, dark brown outlines, coral cheek blush, plant terrarium backpack. Match the first reference's full-body view, proportions and paw placement closely. Output a square canvas with EXACTLY FOUR equally sized square cells, aligned as a 2x2 grid. Each cell is an animation frame of the SAME character at identical scale, head position, feet baseline and framing, facing slightly right; each character entirely fits inside its cell with about 10 percent transparent margin. No cell borders or labels, NO TEXT. Real transparent alpha across all empty areas, no checkerboard or background. TOP LEFT: eyes open, both EMPTY paws just below muzzle, mouth visibly open to receive a bite. TOP RIGHT: content eyes gently closed, mouth closed puckered toward right, LEFT cheek rounded and puffed to show chewing. BOTTOM LEFT: same pose, mouth closed puckered toward left, RIGHT cheek rounded and puffed to show the alternating chew; ears slightly relaxed. BOTTOM RIGHT: swallowing finished, both paws lowered a little, satisfied gentle smile and closed crescent eyes, slight happy head tilt. The changes must be clearly legible as a chewing animation at small UI sizes, yet maintain tight frame-to-frame alignment. No food, no cup, no plate, no extra objects or characters. Soft hand-painted storybook illustration consistent with reference, NOT 3D. Intended for CSS background-position animation; preserve a crisp four-cell grid.",
+      "tool": "built-in image_gen",
+      "transparent_background": true,
+      "layout": "2x2, receive / chew-left / chew-right / satisfied; rendered with CSS background-position, original alpha preserved"
+    }
+  ]
+}
