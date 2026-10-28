@@ -1,0 +1,37 @@
+/* Peach Jam visual theme only. No route, data, or interaction changes. */
+body{background:linear-gradient(155deg,#fff3e8 0%,#ffe8db 55%,#fff7ef 100%)}
+.app-shell{background:linear-gradient(180deg,#fff5ec 0%,#fffaf5 42%,#fff7f0 100%);box-shadow:0 0 65px #ae665522}
+.app-head{background:#fff7f1ed;border-bottom:1px solid #f6dfd4;backdrop-filter:blur(14px)}
+.wordmark{color:#793f34}.wordmark>.icon{background:#ffdfba;color:#d45e4b}
+.bottom-nav{background:#fff7f1f5;border-top-color:#f2d8cb;box-shadow:0 -5px 22px #ba7b6312}
+.bottom-nav button{color:#a4786c}.bottom-nav button.active{color:#cf5c4b;background:#ffe2d6}
+.home-scene{background:radial-gradient(ellipse at 50% 60%,#ffe4d7 0%,#fff1e3 50%,transparent 72%)}
+.mini-float{background:#ffe0d1;color:#9b5444;box-shadow:0 5px 15px #e8aa8b28}
+.module-card{background:#fff0e5;border-color:#f6cdbd;box-shadow:0 6px 18px #c98b6a10}
+.module-card.ghost{background:#fff0f3;border-color:#f3cdd9}
+.module-icon{background:#ffcfb7}.ghost .module-icon{background:#f2d9ff}
+.module-card small{color:#926c63}
+.item-strip{background:#fff1e8;border-color:#f3d8cb}
+.story-option,.food-card,.card,.cart-item,.history-row,.review-row,.recap-card{background:#fffdfa;border-color:#f2dcd0;box-shadow:0 5px 16px #ad6e5110}
+.story-stage{background:linear-gradient(145deg,#fff7f0,#ffe7db);border-color:#f3d4c6}
+.stage-ground{background:#f6c9bb80}.actor-wrap.receiving{border-color:#f29c85;background:#ffe3da80}
+.food-bubble{background:#fffaf5;border-color:#f0d0c0;box-shadow:0 5px 20px #a8654c18}
+.stage-label{color:#a27a6e}.drink-glass{border-color:#d6a998;background:#fff9f2}.drink-glass>div{background:#ffe2b9;border-top-color:#fff0d8}
+.question-card,.motion-feedback{background:#fffdfa;border-color:#f0d6c8}
+.tabs{background:#fce8dd}.tabs button.active{background:#fffdfa;box-shadow:0 2px 7px #bb7a6419}
+.button{background:#f58370;color:#fff;box-shadow:0 3px 0 #d96655}.button.secondary{background:#ffe0ac;color:#75473b;box-shadow:0 3px 0 #e5b878}
+.button.coral{background:#ff9a80;color:#623b32;box-shadow:0 3px 0 #db775f}
+.button.outline{color:#bd5747;border-color:#e9b9a7}.button.text{color:#c65c49}
+.button.danger{color:#a33e32;background:#fff0eb;border-color:#f1c9be}
+.icon-button:hover{background:#ffebe0}.lang-button{background:#ffe0ba;color:#814739}
+.field input,.field select,.field textarea{border-color:#e9cfc1;background:#fffdfa}
+.search input{border-color:#eecfc0;background:#fff7f1}
+.notice{background:#fff0d4;border-color:#f2d9aa}.notice.purple{background:#f8edff;border-color:#e6d3f7}.notice.green{background:#fff1e8;border-color:#f2d4c2}
+.badge{background:#ffebea;color:#a4554e}.chip{border-color:#eed5c9;background:#fffdfa}.chip.active{background:#ffe0c5;border-color:#f0bfa5}
+.money-card{background:#ffe4bd;border-color:#f5cc94}.purchase-group{background:#fff1e7}
+.receipt-compact,.receipt-paper{background:#fffcf6;border-color:#eed7c5;box-shadow:0 7px 0 -4px #ead1bd}
+.file-label{border-color:#edc7b5}.file-label input::file-selector-button{background:#ffe0b4}
+dialog{border-color:#edcfc0;box-shadow:0 20px 100px #75463840}dialog::backdrop{background:#5b3a3770}
+.button.answer{background:#fffdfa;border-color:#edd3c7}.answer:before{border-color:#cda69a}.answer.selected{background:#fff0e7;border-color:#df8d79}.answer.selected:before{border-color:#d96c58}
+.role-note .sprite,.home-scene .sprite,.empty .sprite,.actor-wrap .sprite{filter:drop-shadow(0 9px 14px #bca3d62b)}
+.date-card-future{border-left:4px solid #92b991}.date-card-near{border-left:4px solid #eeb56c}.date-card-today{border-left:4px solid #e68c56}.date-card-past{border-left:4px solid #df6b68}.date-card-unknown{border-left:4px solid #d4c7bd}

@@ -1,0 +1,29 @@
+
+/* v13 — transparent pricing, quantity entry, and mathematically consistent savings. */
+.story-custom-quantity{border:1px solid #E8D3DF;border-radius:18px;padding:16px!important;background:#FFF9F6;margin:16px 0 13px!important}
+.story-custom-quantity .field{margin:0 0 12px!important}
+.story-custom-quantity .field>span{font-size:13px!important;color:#75646D!important;font-weight:750}
+.story-custom-quantity input{font-size:19px!important;min-height:50px!important;background:white!important}
+.story-custom-quantity button{width:100%;min-height:48px!important}
+.usage-live-preview{background:#F5DCE5;color:#75646D;border-radius:12px;padding:12px 14px;margin:0 0 13px;font-size:13px;line-height:1.5;min-height:48px}
+.usage-live-preview>div{display:flex;flex-direction:column;gap:4px}
+.usage-live-preview strong{font-size:15px;color:#75646D}
+.usage-preview-error{color:#9C4B6F;font-weight:700}
+.shortcut-heading{font-size:12px;color:#75646D;line-height:1.5;margin:8px 0 12px}
+.price-total-preview{padding:11px 14px;margin:1px 0 14px;background:#F5DCE5;border:1px solid #E6CAD7;border-radius:13px;color:#75646D;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.price-total-preview small{display:block;font-size:11px;line-height:1.5;color:#75646D}
+.savings-math{background:#FFF9F6;border:1px solid #E7CFDC;border-radius:16px;padding:13px;margin-top:18px;text-align:left}
+.savings-math>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #EFDDE5;font-size:12px;color:#75646D}
+.savings-math>div:last-child{border-bottom:none}
+.savings-math strong{color:#75646D;white-space:nowrap;font-size:13px}
+.savings-math .savings-math-total{font-weight:750;font-size:14px}
+.savings-math .savings-math-total strong{font-size:19px;color:#966780}
+/* Keep all story controls reachable above the fixed bottom navigation. */
+body .app-shell #main{padding-bottom:max(180px,calc(env(safe-area-inset-bottom) + 155px))!important}
+@media(max-width:360px){.savings-math{padding:10px}.savings-math>div{font-size:11px}}
+
+.buy-less-preview{background:#F5DCE5;border:1px solid #E4CAD7;color:#75646D;padding:14px 15px;border-radius:14px;margin:14px 0;font-size:12px;line-height:1.6}
+.buy-less-preview>div{display:flex;flex-direction:column;gap:5px}
+.buy-less-preview b{color:#75646D;font-size:14px}
+.buy-less-preview .savings-preview-sum{border-top:1px solid #E0C2D1;padding-top:9px;margin-top:5px;font-weight:750}
+.buy-less-preview .savings-preview-sum b{color:#9B6482;font-size:18px}

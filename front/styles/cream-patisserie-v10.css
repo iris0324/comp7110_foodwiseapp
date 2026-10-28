@@ -1,0 +1,110 @@
+/* FoodWise approved Japanese Cream Patisserie palette. This last sheet wins over v7/v8/v9 CSS. */
+:root {--ink:#75646D;--muted:#8D7882;--paper:#FFF9F6;--line:#E7D3DF;--green:#DDA5B6;--mint:#F5DCE5;--lime:#F8E2D8;--yellow:#F4E7ED;--orange:#DDA5B6;--purple:#F4E7ED;--v9-cream:#FFF9F6;--v9-coral:#DDA5B6;--v9-peach:#F8E2D8;--v9-brown:#75646D;--v9-line:#E7D3DF;--v9-ink:#75646D}
+html,body{background:#FFF9F6!important;color:#75646D}
+body,.app-shell{background:#FFF9F6!important}
+.app-shell{box-shadow:0 0 50px #75646D0E!important}
+.app-head,.bottom-nav{background:#FFF9F6F6!important;border-color:#E7D3DF!important;box-shadow:0 5px 16px #75646D0B!important}
+.wordmark,.auth-word,.wordmark span,.auth-word span,.wise-accent{color:#75646D!important}
+.wise-accent,.auth-word span{color:#DDA5B6!important}
+.bottom-nav button,.bottom-nav button.active{color:#75646D!important}
+.bottom-nav button.active,.lang-button{background:#F5DCE5!important;color:#75646D!important}
+.module-card.food,.module-card.ghost{background:#FFFFFF!important;border-color:#E7D3DF!important}
+.module-card.food .module-icon{background:#F8E2D8!important}
+.module-card.ghost .module-icon{background:#F4E7ED!important}
+.module-card .module-icon{display:grid;place-items:center;padding:3px!important}
+.module-card .module-icon img{width:56px!important;height:56px!important;object-fit:contain!important;object-position:center!important}
+.home-scene{background:radial-gradient(ellipse at 50% 62%,#F5DCE588 0%,#FFF9F600 75%)!important}
+.button,.button.coral,.button:not(.outline):not(.secondary):not(.text):not(.danger),.hero-cta,.shutter span{background:#DDA5B6!important;color:#FFF9F6!important;border-color:#DDA5B6!important;box-shadow:0 2px 0 #C690A1!important}
+.button.outline,.button.text,.button.secondary,.button.answer{background:#FFFFFF!important;color:#75646D!important;border:1px solid #E2CAD6!important;box-shadow:none!important}
+.button.danger{background:#F4E7ED!important;color:#A14D64!important}
+.button:focus-visible,.story-answer:focus-visible,.bottom-nav button:focus-visible{outline:3px solid #DDA5B6!important;outline-offset:2px}
+.field input,.field select,.field textarea,.search input,.review-row,.question-card,.story-option,.story-answer,.receipt-compact,.checkout-lines,.cart-item,.history-purchase,.history-row,.card,.notice,.savings-history-row,.empty,.gentle-empty,.detail-report{background:#FFFFFF!important;border-color:#EAD8E2!important;color:#75646D!important;box-shadow:none!important}
+.ghost-home-hero,.cart-hero,.story-stage,.ghost-dialogue,.ghost-activity,.ghost-bubble,.savings-result,.savings-overview,.receipt-wait{background:#F4E7ED!important;border-color:#E9D7E1!important;color:#75646D!important}
+.item-strip,.ghost-note,.simple-outcomes,.neutral-finish,.result-panel,.results-panel,.money-card{background:#F8E2D8!important;border-color:#EAD3DA!important;color:#75646D!important}
+.chip{background:#FFFFFF!important;border-color:#E7D3DF!important;color:#75646D!important}
+.chip.active,.chip.category-produce.active,.chip.category-dairy.active,.chip.category-protein.active{background:#DDA5B6!important;border-color:#DDA5B6!important;color:#FFFFFF!important;box-shadow:none!important}
+.food-card.colored-food.produce,.chip.category-produce{background:#F8E2D8!important;border-color:#E6C6D0!important;color:#75646D!important}
+.food-card.colored-food.dairy,.chip.category-dairy{background:#F5DCE5!important;border-color:#DDBECC!important;color:#75646D!important}
+.food-card.colored-food.protein,.chip.category-protein{background:#F4E7ED!important;border-color:#DCC4D2!important;color:#75646D!important}
+.food-card.colored-food.neutral{background:#FFFFFF!important;border-color:#E7D3DF!important}
+.food-card.colored-food{box-shadow:0 5px 16px #75646D0E!important}
+.expiry-summary,.date-card-future,.date-card-unknown{border-color:#E7D3DF!important;background:#FFF9F6!important}
+.date-card-future{border-left:4px solid #DDA5B6!important}
+.date-card-near,.date-card-today{border-left:4px solid #DDA5B6!important}
+.date-card-past{border-left:4px solid #C65A70!important}
+.expiry-word.urgent{color:#B93154!important;font-weight:700}
+.story-answer{background:#FFFFFF!important;border-color:#E7D3DF!important}
+.answer-symbol,.answer-chevron,.ghost-tag,.eyebrow,.entrance-icon,.mini-float{color:#996E83!important}
+.switch.on{background:#DDA5B6!important}
+.badge,.tabs,.tabs button.active{background:#F5DCE5!important;color:#75646D!important}
+.checkout-lines hr,.receipt-compact hr,.receipt-line+hr{border:0!important;border-top:1px solid #EAD8E2!important;background:transparent!important}
+.savings-number,.savings-overview h2,.decision-saving,.savings-history-row>strong{color:#9E637B!important}
+.shutter{background:#FFF9F6!important;border-color:#DDA5B6!important}
+.camera-retry{background:#F4E7ED!important;color:#75646D!important;border-color:#E7D3DF!important}
+.camera-album{color:#75646D!important}
+.ghost-activity{padding:20px 14px!important;margin:16px 0!important;border-radius:22px}
+.activity-title{font-size:1.05rem;margin:0 0 10px;text-align:center;color:#75646D}
+.handover-summary{font-size:12px;line-height:1.65;background:#FFF9F6;border:1px solid #E7D3DF;padding:10px 12px;border-radius:12px;text-align:center;color:#75646D}
+.handover-scene{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:204px;margin:16px 0 11px;padding:14px 6px;background:#FFF9F6;border:1px solid #E9D7E1;border-radius:18px;position:relative}
+.handover-source,.handover-receiver{width:40%;display:grid;place-items:center;flex-shrink:0}
+.handover-receiver{min-height:160px;position:relative;border:2px dashed #DDA5B6;border-radius:22px;background:#F5DCE53D;transition:background .2s,transform .2s}
+.handover-receiver.is-targeted{background:#F5DCE5;transform:scale(1.05)}
+.handover-ghost{max-width:100%;height:124px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 5px 6px #75646D22)}
+.ghost-receive-label{font-size:12px;font-weight:700;color:#75646D}
+.handover-arrow{font-size:24px;color:#DDA5B6;flex-shrink:0}
+.ghost-handover-food{touch-action:none;user-select:none;position:relative;z-index:2;cursor:grab;width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;background:#FFFFFF;border:2px solid #DDA5B6;border-radius:18px;padding:8px 4px;color:#75646D;box-shadow:0 4px 10px #75646D14}
+.ghost-handover-food img{height:67px;max-width:95%;object-fit:contain;pointer-events:none}
+.ghost-handover-food span{font-size:11px;line-height:1.3;max-width:98%;overflow-wrap:anywhere}
+.ghost-handover-food strong{font-size:14px}
+.ghost-handover-food.is-dragging{cursor:grabbing;box-shadow:0 8px 20px #75646D33}
+.ghost-handover-food:disabled{opacity:.32;pointer-events:none}
+.ghost-no-remainder{display:grid;gap:6px;text-align:center;color:#75646D}
+.ghost-no-remainder span{font-size:48px;color:#DDA5B6}
+.handover-destination{position:absolute;bottom:5px;right:8%;display:flex;align-items:center;gap:4px;animation:handover-arrival .4s ease both}
+.handover-destination img{width:52px;height:52px;object-fit:contain}
+.handover-destination span{font-size:10px;max-width:80px;color:#75646D}
+.handover-instruction{font-size:13px;text-align:center;color:#75646D;min-height:2.4em}
+.ghost-activity.activity-complete .handover-ghost{animation:handover-celebrate .55s ease-in-out}
+.ghost-activity.activity-complete .handover-receiver{background:#F5DCE5}
+.ghost-activity .button{margin-top:8px;width:100%}
+.story-previous{margin-top:15px!important}
+#main{scroll-margin-top:80px;padding-top:20px!important;min-height:60vh}
+@keyframes handover-celebrate{0%{transform:scale(1)}40%{transform:translateY(-9px) rotate(-3deg) scale(1.06)}100%{transform:scale(1)}}
+@keyframes handover-arrival{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.ghost-activity *{animation:none!important;transition:none!important}}
+
+/* Additional surfaces must not inherit older rainbow fills. */
+.ghost-home-footer,.secondary-entrances .entrance,.entrance,.story-option.story-illustrated,.purchase-group,.choose-row,.receipt-heading,.history-item,.setting-card,.legal-page,.help-page{background:#FFFFFF!important;border-color:#E7D3DF!important;color:#75646D!important}
+.entrance-icon.peach,.entrance-icon.lavender,.generic-item-icon,.history-item .generic-item-icon{background:#F5DCE5!important;color:#75646D!important}
+.hero-icon,.cart-hero .sprite,.hand-over{background:#F4E7ED!important}
+.gentle-empty,.empty-basket{color:#75646D!important}
+.ghost-home-hero{background:#F5DCE5!important}
+.shutter:focus-visible,.ghost-handover-food:focus-visible{outline:3px solid #DDA5B6;outline-offset:2px}
+@media(max-width:450px){.handover-scene{padding:12px 5px;min-height:175px}.handover-receiver{min-height:140px}.handover-ghost{height:105px}.handover-food img{height:56px}.handover-destination img{width:39px;height:39px}}
+
+/* Route-specific story atmospheres and Ghosty-handled destination: no green or unrelated choices. */
+.ghost-activity-amount .handover-scene{background:#FFF9F6}
+.ghost-activity-quantity .handover-scene{background:#F8E2D8}
+.ghost-activity-time .handover-scene{background:#F4E7ED}
+.ghost-activity.activity-complete .handover-destination{animation:ghosty-delivers .75s cubic-bezier(.18,.78,.3,1) both}
+.ghost-activity.activity-complete .handover-receiver{border-style:solid}
+@keyframes ghosty-delivers{0%{opacity:0;transform:translate(-42px,-22px) scale(.55)}55%{opacity:1;transform:translate(4px,-12px) scale(1.1)}100%{opacity:1;transform:translate(0,0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.ghost-activity.activity-complete .handover-destination{animation:none!important}}
+body.reduce-motion .ghost-activity.activity-complete .handover-destination,body.no-story-animations .ghost-activity.activity-complete .handover-destination{animation:none!important}
+/* Eliminate green-tinted legacy surface/border states that remain outside general cards. */
+.icon-button:hover{background:#F5DCE5!important}
+.detail-line,.receipt-line{border-bottom-color:#EAD8E2!important}
+.receipt-line{border-bottom-style:solid!important}
+.file-label,dialog{background:#FFF9F6!important;border-color:#E7D3DF!important;color:#75646D!important}
+.file-label input::file-selector-button{background:#F5DCE5!important;color:#75646D!important}
+dialog::backdrop{background:#75646D70!important}
+.answer.selected{background:#F5DCE5!important;border-color:#DDA5B6!important}
+.answer.selected:before{border-color:#DDA5B6!important}
+.answer:before{border-color:#DDA5B6!important}
+.motion-feedback,.recap-card,.food-bubble{background:#F4E7ED!important;border-color:#E7D3DF!important;color:#75646D!important}
+.motion-live,.save-indicator,.plan-label{color:#996E83!important}
+.stage-ground,.actor-wrap.receiving,.drink-glass>div,.empty-portion{background:#F5DCE5!important;border-color:#DDA5B6!important;color:#75646D!important}
+.food-card.date-card-future,.expiry-summary.date-card-future{border-left-color:#DDA5B6!important;background:#FFF9F6!important}
+.food-card.date-card-near,.expiry-summary.date-card-near,.food-card.date-card-today,.expiry-summary.date-card-today{border-left-color:#D98F91!important;background:#F8E2D8!important}
+.food-card.date-card-unknown,.expiry-summary.date-card-unknown{border-left-color:#E2CAD6!important;background:#FFF9F6!important}
+.food-card.date-card-past,.expiry-summary.date-card-past{border-left-color:#C65A70!important;background:#F4E7ED!important}
